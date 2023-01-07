@@ -1,0 +1,8 @@
+env/
+.ipynb_checkpoints/
+__pycache__/
+build/
+deepthink.egg-info/
+dist/
+Data/mnist784.p
+Data/CaliforniaHousing.csv
