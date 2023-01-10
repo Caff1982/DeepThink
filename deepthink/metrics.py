@@ -84,3 +84,37 @@ def accuracy(y_true, y_hat):
         The accuracy between labels and predictions
     """
     return np.mean(np.argmax(y_true, axis=1) == np.argmax(y_hat, axis=1))
+
+def confusion_matrix(y_true, y_hat, k):
+    """
+    Return a 2D confusion matrix where the rows are the actual values
+    and columns are predicted values.
+
+    Parameters
+    ----------
+    y_true : np.array
+        The ground truth values
+    y_hat : np.array
+        The predicted values.
+
+    Returns
+    -------
+    result : np.array
+        Two dimensional array representing actual and predicted values
+    
+    References
+    ----------
+    - https://en.wikipedia.org/wiki/Confusion_matrix
+    """
+    # If arrays are one-hot-encoded convert to 1D arrays
+    if len(y_true.shape) == 2:
+        y_true = np.argmax(y_true, axis=1)
+    if len(y_hat.shape) == 2:
+        y_hat = np.argmax(y_hat, axis=1)
+    # Initialize the empty array with zeros
+    result = np.zeros((k, k), dtype=int)
+    # Iterate over preds/labels
+    for i in range(len(y_hat)):
+        result[y_true[i]][y_hat[i]] += 1
+    
+    return result

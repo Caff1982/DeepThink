@@ -79,7 +79,7 @@ class ReLU:
         self.dinputs = grads.copy()
         self.dinputs[self.inputs < 0] = 0.0
         return self.dinputs
-
+        
 
 class TanH:
     """

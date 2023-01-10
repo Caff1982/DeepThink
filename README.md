@@ -21,7 +21,7 @@ pip install deepthink
 
 Here is a simple example of how to use DeepThink to train a deep learning model:
 
-```
+```python
 from deepthink.optimizers import Adam
 from deepthink.layers import Dense, Conv2D, MaxPooling, Flatten
 from deepthink.model import Model
