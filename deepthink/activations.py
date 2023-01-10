@@ -79,7 +79,97 @@ class ReLU:
         self.dinputs = grads.copy()
         self.dinputs[self.inputs < 0] = 0.0
         return self.dinputs
-        
+
+
+class LeakyReLU:
+    """
+    Leaky version of Rectified Linear Unit activation function.
+
+    Applies a small gradient when the values are negative, otherwise
+    returns the value, applied elementwise.
+
+    Parameters
+    ----------
+    alpha : float,default=0.1
+        Constant to scale negative values by. Controls the slope
+        of the negative gradients.
+
+    References
+    ----------
+    - https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Variants
+    - https://arxiv.org/pdf/1505.00853.pdf
+    """
+    def __init__(self, alpha=0.1):
+        self.alpha = alpha
+
+    def __repr__(self):
+        return 'Leaky-ReLU Activation'
+
+    def forward(self, x):
+        """
+        Return the input array with Leaky ReLU activation applied.
+
+        The inputs are also stored as instance attributes to be
+        used in backpropagation.
+        """
+        self.inputs = x
+        self.output = np.where(x < 0, x * self.alpha, x)
+        return self.output
+
+    def backward(self, grads):
+        """
+        Return the derivative of Leaky ReLU function.
+
+        The result is stored as an instance attribute "dinputs",
+        to be used in backpropogation.
+        """
+        self.dinputs = np.where(self.inputs < 0, grads * self.alpha, grads)
+        return self.dinputs
+
+
+class ELU:
+    """
+    Exponential Linear Unit activation function.
+
+    Parameters
+    ----------
+    alpha : float,default=1.0
+        Scale for the negative factor. Decreasing this will make the
+        activation more like ReLU.
+
+    References
+    ----------
+    - https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Variants
+    """
+    def __init__(self, alpha=1.0):
+        self.alpha = alpha
+
+    def __repr__(self):
+        return 'ELU Activation'
+
+    def forward(self, x):
+        """
+        Return the input array with ELU activation applied.
+
+        The inputs are also stored as instance attributes to be
+        used in backpropagation.
+        """
+        self.inputs = x
+        self.output = np.where(x < 0, self.alpha * (np.exp(x) - 1.0), x)
+        return self.output
+
+    def backward(self, grads):
+        """
+        Return the derivative of ELU function.
+
+        The result is stored as an instance attribute "dinputs",
+        to be used in backpropogation.
+        """
+        self.dinputs = np.where(self.inputs < 0,
+                                grads * self.alpha * np.exp(self.inputs),
+                                grads)
+        return self.dinputs
+
 
 class TanH:
     """

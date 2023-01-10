@@ -162,12 +162,12 @@ def load_mnist_data(filepath=None, test_split=60000,
 def display_confusion_matrix(matrix, k, title=None, figsize=(10, 10)):
     """
     Display a confusion matrix showing predctions and labels.
-    
+
     Parameters
     ----------
     matrix : np.array
-        A 2D confusion matrix array where rows are predicted labels and columns
-        are actual labels.
+        A 2D confusion matrix array where rows are predicted labels and
+        columns are actual labels.
     k : int
         The number of classes
     title : str,default=None
@@ -177,18 +177,19 @@ def display_confusion_matrix(matrix, k, title=None, figsize=(10, 10)):
     """
     fig, ax = plt.subplots(figsize=figsize)
     # Use imshow to display the values as colors
-    im = ax.imshow(matrix, cmap='turbo')
+    ax.imshow(matrix, cmap='turbo')
     # Iterate over each column/row and add value from matrix as text
     for i in range(len(matrix)):
         for j in range(len(matrix)):
-            ax.text(j, i, matrix[i, j], color='w', size=15, ha='center', va='center')
+            ax.text(j, i, matrix[i, j], color='w', size=15,
+                    ha='center', va='center')
     # Setting the x & y ticks
     ticks = list(range(k))
     ax.set_xticks(ticks)
     ax.set_yticks(ticks)
     ax.set_ylabel('Predicted label', fontsize=15)
     ax.set_xlabel('Actual label', fontsize=15)
-    
+
     plt.grid(False)
     if title:
         plt.title(title)

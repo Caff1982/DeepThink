@@ -85,6 +85,7 @@ def accuracy(y_true, y_hat):
     """
     return np.mean(np.argmax(y_true, axis=1) == np.argmax(y_hat, axis=1))
 
+
 def confusion_matrix(y_true, y_hat, k):
     """
     Return a 2D confusion matrix where the rows are the actual values
@@ -96,12 +97,14 @@ def confusion_matrix(y_true, y_hat, k):
         The ground truth values
     y_hat : np.array
         The predicted values.
+    k : int
+        The number of classes.
 
     Returns
     -------
     result : np.array
         Two dimensional array representing actual and predicted values
-    
+
     References
     ----------
     - https://en.wikipedia.org/wiki/Confusion_matrix
@@ -116,5 +119,5 @@ def confusion_matrix(y_true, y_hat, k):
     # Iterate over preds/labels
     for i in range(len(y_hat)):
         result[y_true[i]][y_hat[i]] += 1
-    
+
     return result
