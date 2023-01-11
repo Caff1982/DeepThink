@@ -321,3 +321,29 @@ class Model:
                 bias_arr = params[idx:idx+layer.bias.size]
                 layer.bias = bias_arr.reshape(layer.bias.shape)
                 idx += layer.bias.size
+
+    def save(self, filepath):
+        """
+        Save the model's weights & biases to specified filepath.
+
+        File-type should be '.npy'.
+
+        Parameters
+        ----------
+        filepath : str
+            The location to save the model's parameters.
+        """
+        params = self.get_params()
+        np.save(filepath, params)
+
+    def load(self, filepath):
+        """
+        Load model parameters from specified filepath.
+
+        Parameters
+        ----------
+        filepath : str
+            The location to load the model's parameters from.
+        """
+        params = np.load(filepath)
+        self.set_params(params)
