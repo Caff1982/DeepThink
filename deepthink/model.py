@@ -211,13 +211,12 @@ class Model:
                 permutation = np.random.permutation(X_train.shape[0])
                 X_train_shuffled = X_train[permutation]
                 y_train_shuffled = y_train[permutation]
-            # model_outputs stores models predictions and is
-            # used to evaluate performance at epoch end.
+            # initialize model_outputs to store model predictions and
+            # is used to evaluate performance at epoch end.
             model_outputs = np.zeros((num_batches * self.batch_size,
                                      y_train.shape[1]), dtype=self.dtype)
-            # Iterate over each mini-batch, perform forward &
-            # backward pass, and optimizer update
-            for batch_idx in tqdm(range(num_batches)):
+            # Iterate over each mini-batch
+            for batch_idx in tqdm(range(num_batches), disable=not verbose):
                 start = batch_idx * self.batch_size
                 end = start + self.batch_size
                 X_batch = X_train_shuffled[start:end,]

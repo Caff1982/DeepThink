@@ -22,7 +22,7 @@ class History:
     keys are the metrics and values are arrays recording performance
     at each epoch. This is similar to Kera's History.history.
 
-    Training history can be visualized by calling 'plot_training_hist'
+    Training history can be visualized by calling 'plot_history'
     once training has been completed.
 
     Parameters
@@ -121,7 +121,7 @@ class History:
             # Display row
             print(row)
 
-    def plot_training_hist(self):
+    def plot_history(self):
         """
         Display model training performance at each epoch.
 
@@ -131,9 +131,11 @@ class History:
         """
 
         if len(self.metrics) == 1:
-            fig, axes = plt.subplots(1, figsize=(16, 8))
+            fig, axes = plt.subplots(1, figsize=(14, 8))
+            # Need to be able to index into axes
+            axes = [axes]
         else:
-            fig, axes = plt.subplots(2, figsize=(16, 12))
+            fig, axes = plt.subplots(2, figsize=(14, 12))
 
         x_labels = list(range(len(self.history['loss'])))
         x_ticks = [i for i in range(len(self.history['loss']))]
