@@ -73,8 +73,9 @@ class Model:
             # Set data-type for layer
             layer.dtype = self.dtype
 
+            # Initialize parameters for layer
             if hasattr(layer, 'initialize'):
-                # All layers except activation layers have 'initialize'
+                # All layers have initialize except activations
                 layer.initialize()
             else:
                 # Activation function so outputs same shape as inputs
@@ -122,7 +123,7 @@ class Model:
         """
         self.layers.append(layer)
 
-    def forward(self, X):
+    def forward(self, X, training=True):
         """
         Perform a forward pass through the network layers.
 
@@ -130,6 +131,9 @@ class Model:
         ---------
         X : numpy.array
             The batch of input data to perform forward pass.
+        training : bool,default=True
+            Parameter used for Dropout layer since it operates
+            differently between training and inference.
 
         Returns
         -------
@@ -137,7 +141,11 @@ class Model:
             The output predictions from the model.
         """
         for layer in self.layers:
-            X = layer.forward(X)
+            if hasattr(layer, 'proba'):
+                # If layer is Dropout pass training argument
+                X = layer.forward(X, training=training)
+            else:
+                X = layer.forward(X)
         return X
 
     def backward(self, dZ):
@@ -285,7 +293,8 @@ class Model:
         # batch_idx is used as current batch index
         batch_idx = 0
         while batch_idx < len_preds:
-            batch_preds = self.forward(X[batch_idx:batch_idx+self.batch_size])
+            batch_preds = self.forward(X[batch_idx:batch_idx + self.batch_size],
+                                       training=False)
             predictions[batch_idx:batch_idx + self.batch_size] = batch_preds
             batch_idx += self.batch_size
 
