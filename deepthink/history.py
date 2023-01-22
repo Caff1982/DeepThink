@@ -107,13 +107,12 @@ class History:
             row = f"Epoch: {current_epoch}/{self.n_epochs}, " + \
                   f"elapsed-time: {elapsed_time:.2f}s - "
 
-            # Add model's training cost/loss and all other metrics to row
+            # Add training cost/loss and all other metrics to row
             row += f"loss: {self.history['loss'][-1]:.4f} - "
             for metric in self.metrics[1:]:
                 last_value = self.history[metric][-1]
                 row += f"{metric}: {last_value:.4f} - "
-
-            # Add validation metrics to row
+            # Add validation loss and metrics to row
             row += f"val_loss: {self.history['val_loss'][-1]:.4f} - "
             for metric in self.metrics[1:]:
                 last_value = self.history['val_' + metric][-1]
@@ -121,15 +120,24 @@ class History:
             # Display row
             print(row)
 
-    def plot_history(self):
+    def plot_history(self, display_image=True, save_fname=None):
         """
         Display model training performance at each epoch.
 
         Plots model cost/loss per epoch on training and validation.
-        If any additional metrics are added then it will plot loss and
-        one other metric.
-        """
+        If any additional metrics are added then it will plot loss
+        and one other metric.
 
+        Parameters
+        ----------
+        display_image : book,default=True
+            Boolean parameter to control whether the images is shown
+            or not
+        save_fname : str,default=None
+            Optional argument to save the image, if used it should be
+            the filename to save the image as.
+        """
+        # Set figure-size depending on number of metrics
         if len(self.metrics) == 1:
             fig, axes = plt.subplots(1, figsize=(14, 8))
             # Need to be able to index into axes
@@ -161,4 +169,7 @@ class History:
 
         plt.xlabel('Epoch', fontsize='large')
         plt.legend(fontsize='large', framealpha=1, fancybox=True)
-        plt.show()
+        if save_fname:
+            plt.savefig(save_fname)
+        if display_image:
+            plt.show()

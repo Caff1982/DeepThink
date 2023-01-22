@@ -2,6 +2,7 @@ import numpy as np
 from tqdm import tqdm
 
 from deepthink.history import History
+from deepthink.layers import Dropout, BatchNorm
 
 
 class Model:
@@ -132,8 +133,8 @@ class Model:
         X : numpy.array
             The batch of input data to perform forward pass.
         training : bool,default=True
-            Parameter used for Dropout layer since it operates
-            differently between training and inference.
+            Parameter used for Dropout/BatchNorm layers since they
+            operate differently between training and inference.
 
         Returns
         -------
@@ -141,8 +142,7 @@ class Model:
             The output predictions from the model.
         """
         for layer in self.layers:
-            if hasattr(layer, 'proba'):
-                # If layer is Dropout pass training argument
+            if isinstance(layer, (BatchNorm, Dropout)):
                 X = layer.forward(X, training=training)
             else:
                 X = layer.forward(X)
