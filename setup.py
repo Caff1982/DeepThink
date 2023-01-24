@@ -7,7 +7,7 @@ long_description = (this_directory / 'README.md').read_text()
 
 setup(
     name='deepthink',
-    version='0.1.3',    
+    version='0.1.3',
     description='Deep Learning library',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -20,12 +20,11 @@ setup(
                       'matplotlib>=3.6.2',
                       'scikit-learn>=1.1.2',
                       'tqdm>=4.64.1',
-                      'pandas>=1.4.1'          
+                      'pandas>=1.4.1'
                       ],
     classifiers=[
         'Development Status :: 3 - Alpha',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',  
+        'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX :: Linux',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.9',

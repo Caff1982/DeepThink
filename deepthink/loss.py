@@ -66,6 +66,70 @@ class CategoricalCrossEntropy:
         return (self.y_hat - self.y_true) / self.y_true.shape[0]
 
 
+class BinaryCrossEntropy:
+    """
+    Binary Cross Entropy, (BCE).
+
+    Binary cross-entropy is a loss function that measures the
+    difference between the predicted and true probabilities for
+    a binary classification task. It is calculated as the negative
+    logarithm of the predicted probability of the true class.
+    It is often used with sigmoid activation functions in binary
+    classification tasks.
+    """
+
+    def __str__(self):
+        return 'Binary Cross-entropy (BCE)'
+
+    def __call__(self, y_true, y_hat):
+        return self.loss(y_true, y_hat)
+
+    def loss(self, y_true, y_hat, epsilon=1e-7):
+        """
+        Return the binary crossentropy (BCE) loss between labels
+        and predictions.
+
+        Labels are expected to be a binary array and predictions
+        should be the output of a sigmoid layer. Both input arrays
+        should be the same length. Both predictions and labels are
+        stored as instance attributes for use with "grads" method.
+
+        Parameters
+        ----------
+        y_true : np.array
+            The ground truth values, binary.
+        y_hat : np.array
+            The predicted values as probabilties.
+        epsilon : float,default=1e-7
+            Constant used to avoid log of zero errors.
+
+        Returns
+        -------
+        bce_loss: float
+            The binary crossentropy loss between predictions and labels
+        """
+        assert y_true.shape == y_hat.shape
+        self.y_true = y_true
+        self.y_hat = y_hat
+        # Clip values to avoid errors
+        y_hat = np.clip(y_hat, epsilon, 1-epsilon)
+        bce_loss = -np.mean(y_true * np.log(y_hat)
+                            + (1-y_true) * np.log(1-y_hat))
+
+        return bce_loss
+
+    def grads(self):
+        """
+        Return the gradients/derivative for y_true and y_hat.
+
+        Uses labels and predictions from previous call to "loss"
+        to calculate the derivatives.
+        """
+        return (-(self.y_true - self.y_hat)
+                / (self.y_hat * (1-self.y_hat))
+                / self.y_true.shape[0])
+
+
 class MeanSquaredError:
 
     def __call__(self, y_true, y_hat):

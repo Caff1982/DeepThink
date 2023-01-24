@@ -86,6 +86,33 @@ def accuracy(y_true, y_hat):
     return np.mean(np.argmax(y_true, axis=1) == np.argmax(y_hat, axis=1))
 
 
+def binary_accuracy(y_true, y_hat, threshold=0.5):
+    """
+    Return how often predictions match binary labels.
+
+    This function provides an accuracy metric for binary
+    classification tasks. The predictions, y_hat, should
+    be probabilities between 0 and 1. The'threshold' argument
+    decides which prediction values are rounded to 0 or 1.
+
+    Parameters
+    ----------
+    y_true : np.array
+        The ground truth values.
+    y_hat : np.array
+        The predicted values.
+    threshold : float,default=0.5
+        The threshold for deciding whether prediction values are 1 or 0.
+
+    Returns
+    -------
+    np.array
+        The accuracy between labels and predictions
+    """
+    assert y_true.shape == y_hat.shape
+    return np.mean((y_hat > threshold).astype(int) == y_true)
+
+
 def confusion_matrix(y_true, y_hat, k):
     """
     Return a 2D confusion matrix where the rows are the actual values

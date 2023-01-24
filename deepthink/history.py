@@ -6,7 +6,8 @@ from matplotlib.ticker import MaxNLocator
 from deepthink.metrics import (mean_squared_error,
                                root_mean_squared_error,
                                mean_absolute_error,
-                               accuracy)
+                               accuracy,
+                               binary_accuracy)
 
 
 class History:
@@ -47,6 +48,7 @@ class History:
 
     metric_dict = {
         'Accuracy': accuracy,
+        'BinaryAccuracy': binary_accuracy,
         'RMSE': root_mean_squared_error,
         'MAE': mean_absolute_error,
         'MSE': mean_squared_error,
