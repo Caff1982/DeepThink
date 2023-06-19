@@ -106,6 +106,8 @@ class Model:
             output_shape = (None, *layer.output.shape[1:])
             if hasattr(layer, 'weights'):
                 row = [layer, output_shape, layer.weights.size]
+                if hasattr(layer, 'bias'):
+                    row[2] += layer.bias.size
             else:
                 row = [layer, output_shape, 0]
             row = [str(x) for x in row]
@@ -227,12 +229,12 @@ class Model:
             for batch_idx in tqdm(range(num_batches), disable=not verbose):
                 start = batch_idx * self.batch_size
                 end = start + self.batch_size
-                X_batch = X_train_shuffled[start:end,]
-                y_batch = y_train_shuffled[start:end,]
+                X_batch = X_train_shuffled[start:end]
+                y_batch = y_train_shuffled[start:end]
                 # Forward pass
                 outputs = self.forward(X_batch)
                 # Store outputs to be used for evaluation
-                model_outputs[start:end,] = outputs
+                model_outputs[start:end] = outputs
                 # Get loss & derivatives and perform backward pass
                 loss = self.cost.loss(y_batch, outputs)
                 dZ = self.cost.grads()
@@ -312,6 +314,7 @@ class Model:
         for layer in self.layers:
             if hasattr(layer, 'weights'):
                 params.extend(layer.weights.flatten())
+            if hasattr(layer, 'bias'):
                 params.extend(layer.bias.flatten())
         return np.array(params)
 
@@ -326,6 +329,7 @@ class Model:
                 weights_arr = params[idx:idx+layer.weights.size]
                 layer.weights = weights_arr.reshape(layer.weights.shape)
                 idx += layer.weights.size
+            if hasattr(layer, 'bias'):
                 bias_arr = params[idx:idx+layer.bias.size]
                 layer.bias = bias_arr.reshape(layer.bias.shape)
                 idx += layer.bias.size
