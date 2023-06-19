@@ -11,7 +11,8 @@ def initialize_weights(shape, init_type, dtype=np.float32):
     Return initialized weights for a trainable layer.
 
     Weights can either be implemented using Glorot or He initialization
-    and can be either uniform or normal distribution.
+    and can be either uniform or normal distribution. Basic uniform
+    and normal distribution are also supported.
 
     Parameters
     ----------
@@ -29,8 +30,8 @@ def initialize_weights(shape, init_type, dtype=np.float32):
 
     References
     ----------
-    - https://arxiv.org/pdf/1502.01852.pdf (He/Kaiming)
-    - http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf (Glorot/Xavier)
+    - https://arxiv.org/pdf/1502.01852.pdf
+    - http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf
     - https://keras.io/api/layers/initializers/
     """
     # Ensure fan_in and fan_out are scalar values
@@ -46,16 +47,20 @@ def initialize_weights(shape, init_type, dtype=np.float32):
 
     if init_type == 'glorot_normal':
         stddev = np.sqrt(2.0 / (fan_in + fan_out))
-        return np.random.randn(*shape).astype(np.float32) * stddev
+        return np.random.normal(0.0, stddev, size=shape).astype(dtype)
     elif init_type == 'glorot_uniform':
         limit = np.sqrt(6.0 / (fan_in + fan_out))
         return np.random.uniform(limit, -limit, size=shape).astype(dtype)
     elif init_type == 'he_normal':
         stddev = np.sqrt(2.0 / fan_in)
-        return np.random.randn(*shape).astype(np.float32) * stddev
+        return np.random.normal(0.0, stddev, size=shape).astype(dtype)
     elif init_type == 'he_uniform':
         limit = np.sqrt(6.0 / fan_in)
         return np.random.uniform(limit, -limit, size=shape).astype(dtype)
+    elif init_type == 'uniform':
+        return np.random.uniform(-0.05, 0.05, size=shape).astype(dtype)
+    elif init_type == 'normal':
+        return np.random.normal(0.0, 0.05, size=shape).astype(dtype)
     else:
         raise Exception(f'Weight init type "{init_type}" not recognized')
 
