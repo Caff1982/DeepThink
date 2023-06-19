@@ -49,10 +49,11 @@ class CategoricalCrossEntropy:
         """
 
         assert y_true.shape == y_hat.shape
-        self.y_true = y_true
-        self.y_hat = y_hat
         # Clip values to avoid errors
         y_hat = np.clip(y_hat, epsilon, 1-epsilon)
+        # Store labels and predictions for use in backprop
+        self.y_true = y_true
+        self.y_hat = y_hat
         cce_loss = np.sum(y_true.T * -np.log(y_hat.T)) / y_true.shape[0]
         return cce_loss
 
@@ -109,13 +110,13 @@ class BinaryCrossEntropy:
             The binary crossentropy loss between predictions and labels
         """
         assert y_true.shape == y_hat.shape
-        self.y_true = y_true
-        self.y_hat = y_hat
         # Clip values to avoid errors
-        y_hat = np.clip(y_hat, epsilon, 1-epsilon)
-        bce_loss = -np.mean(y_true * np.log(y_hat)
-                            + (1-y_true) * np.log(1-y_hat))
-
+        y_hat_clip = np.clip(y_hat, epsilon, 1-epsilon)
+        # Store labels and predictions for use in backprop
+        self.y_true = y_true
+        self.y_hat = y_hat_clip
+        bce_loss = -np.mean(y_true * np.log(y_hat_clip)
+                            + (1-y_true) * np.log(1-y_hat_clip))
         return bce_loss
 
     def grads(self):

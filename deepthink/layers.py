@@ -373,6 +373,86 @@ class Conv2D(BaseLayer):
         self.dinputs = dX.transpose(0, 3, 1, 2)
 
 
+class EmbeddingLayer(BaseLayer):
+    """
+    Embedding layer for mapping discrete entities to dense vectors.
+
+    Parameters
+    ----------
+    vocab_size : int
+        The number of unique entities in the vocabulary.
+    emb_dims : int
+        The number of dimensions to map each entity to.
+    input_shape : tuple
+        The shape of the input tensor. E.g. (batch, sequence_length).
+    weight_init : str,default='uniform'
+        The weight initialization strategy to use for the weights.
+    """
+    def __init__(self, vocab_size, emb_dims, input_shape,
+                 weight_init='uniform', **kwargs):
+        super().__init__(**kwargs)
+        self.vocab_size = vocab_size
+        self.emb_dims = emb_dims
+        self.weight_init = weight_init
+        self.input_shape = input_shape
+
+    def __str__(self):
+        return 'Embedding Layer'
+
+    def initialize(self):
+        """
+        Initialize the embedding layer.
+        """
+        self.seq_len = self.input_shape[-1]
+        weights_shape = (self.vocab_size, self.emb_dims)
+        self.weights = initialize_weights(weights_shape,
+                                          self.weight_init,
+                                          self.dtype)
+
+        self.output = np.zeros((self.input_shape[0],
+                                self.emb_dims,
+                                self.seq_len))
+
+        # Initialize arrays to store optimizer momentum values
+        self.weight_momentum = np.zeros(weights_shape, dtype=self.dtype)
+        # Initialize arrays to store optimizer gradient cache
+        self.weight_grad_cache = np.zeros(weights_shape, dtype=self.dtype)
+
+    def forward(self, X):
+        """
+        Perform the forward pass on inputs X.
+
+        Parameters
+        ----------
+        X : array-like, shape (batch_size, input_length)
+            Input sequence of word indices.
+
+        Returns
+        -------
+        output : array-like, shape (batch_size, input_length, output_dim)
+            Embedding vectors for the input sequence.
+        """
+        self.input = X
+        self.output = self.weights[self.input]
+        return self.output.transpose(0, 2, 1)
+
+    def backward(self, grads):
+        """
+        Perform backpropagation by computing the gradients.
+
+        Note that the gradients w.r.t. the inputs are not calculated
+        as this layer is typically used as the first layer in a network.
+
+        Parameters
+        ----------
+        grads : array-like, shape (batch_size, input_length, output_dim)
+            Gradients from the subsequent layer.
+        """
+        self.dweights = np.zeros_like(self.weights)
+
+        np.add.at(self.dweights, self.input, grads.transpose(0, 2, 1))
+
+
 class MaxPooling(BaseLayer):
     """
     Max pooling operation for 2D data.
@@ -490,6 +570,71 @@ class MaxPooling(BaseLayer):
         # Use the indices to allocate the gradients correctly
         self.dinputs[im, ic, ih2, iw2] = grads[im, ic, ih, iw].flatten()
 
+        return self.dinputs
+
+
+class GlobalAveragePoolingLayer:
+    """
+    Global Average Pooling layer.
+
+    Parameters
+    ----------
+    axis : int or tuple, default=-1
+        The axis or axes along which the pooling is applied.
+    """
+    def __init__(self, axis=-1):
+        self.axis = axis
+
+    def __str__(self):
+        return 'GlobalAveragePooling'
+
+    def initialize(self):
+        """
+        Initialize the global average pooling layer.
+        """
+        if self.prev_layer:
+            self.input_shape = self.prev_layer.output.shape
+        else:
+            raise Exception('GlobalAveragePooling cannot be the first layer')
+
+        self.output = np.zeros((self.input_shape[0], self.input_shape[1]))
+
+    def forward(self, X):
+        """
+        Perform the forward pass on inputs X.
+
+        Parameters
+        ----------
+        X : array-like, shape (batch_size, features, seq_len)
+            Input tensor.
+
+        Returns
+        -------
+        output : array-like, shape (batch_size, features)
+            Average-pooled output tensor.
+        """
+        self.input = X
+        self.output = np.mean(X, axis=self.axis)
+        return self.output
+
+    def backward(self, grads):
+        """
+        Perform backpropagation by computing the gradients.
+
+        Parameters
+        ----------
+        grads : array-like, shape (batch_size, features)
+            Gradients from the subsequent layer.
+
+        Returns
+        -------
+        dinputs : array-like, shape (batch_size, features, seq_len)
+            Gradients for the inputs.
+        """
+        seq_len = self.input_shape[-1]
+        self.dinputs = np.ones(grads.shape) * grads / seq_len
+        # Broadcast the gradients to the input shape
+        self.dinputs = self.dinputs[..., np.newaxis].repeat(seq_len, axis=-1)
         return self.dinputs
 
 
