@@ -99,23 +99,27 @@ class SGD(BaseOptimizer):
         applying updates to each layer with weights & biases.
         """
         for layer in self.layers:
-            # Check that layer has trainable parameters
+            # Check that layer has trainable weights
             if hasattr(layer, 'dweights'):
                 weight_updates = np.multiply(-self.learning_rate,
                                              layer.dweights)
-                bias_updates = np.multiply(-self.learning_rate,
-                                           layer.dbiases)
                 if self.momentum:
                     # Add momentum updates
                     weight_updates += np.multiply(self.momentum,
                                                   layer.weight_momentum)
-                    bias_updates += np.multiply(self.momentum,
-                                                layer.bias_momentum)
                     # Update layer momentum
                     layer.weight_momentum = weight_updates
-                    layer.bias_updates = bias_updates
                 # Perform update to weights
                 layer.weights += weight_updates
+            # Check if layer has trainable bias
+            if hasattr(layer, 'dbiases'):
+                bias_updates = np.multiply(-self.learning_rate,
+                                           layer.dbiases)
+                if self.momentum:
+                    bias_updates += np.multiply(self.momentum,
+                                                layer.bias_momentum)
+                    layer.bias_momentum = bias_updates
+                # Perform update to bias
                 layer.bias += bias_updates
 
         # Update learning-rate and iteration
@@ -156,25 +160,27 @@ class NAG(BaseOptimizer):
         updates to each layer with weights & biases
         """
         for layer in self.layers:
-            # Check that layer has trainable parameters
+            # Check that layer has trainable weights
             if hasattr(layer, 'dweights'):
                 old_w_mom = layer.weight_momentum.copy()
-                old_b_mom = layer.bias_momentum.copy()
-
+                # Get the new momentum 
                 layer.weight_momentum = np.subtract(
                     np.multiply(self.momentum, old_w_mom),
                     np.multiply(self.learning_rate, layer.dweights))
-                layer.bias_momentum = np.subtract(
-                    np.multiply(self.momentum, old_b_mom),
-                    np.multiply(self.learning_rate, layer.dbiases))
-                # Perform weight & bias updates
+                # Perform weight update
                 layer.weights -= np.subtract(
                     np.multiply(self.momentum, old_w_mom),
                     np.multiply((1 + self.momentum), layer.weight_momentum))
+            # Check if layer has trainable bias
+            if hasattr(layer, 'dbiases'):
+                old_b_mom = layer.bias_momentum.copy()
+                layer.bias_momentum = np.subtract(
+                    np.multiply(self.momentum, old_b_mom),
+                    np.multiply(self.learning_rate, layer.dbiases))
                 layer.bias -= np.subtract(
                     np.multiply(self.momentum, old_b_mom),
                     np.multiply((1 + self.momentum), layer.bias_momentum))
-
+    
         # Update learning-rate and iteration
         self.on_batch_end()
 
@@ -209,7 +215,7 @@ class AdaGrad(BaseOptimizer):
         updates to each layer with weights & biases
         """
         for layer in self.layers:
-            # Check that layer has trainable parameters
+            # Check that layer has trainable weights
             if hasattr(layer, 'dweights'):
                 # Normal SGD update
                 weight_updates = np.multiply(-self.learning_rate,
@@ -218,11 +224,15 @@ class AdaGrad(BaseOptimizer):
                                            layer.dbiases)
                 # Update gradient cache
                 layer.weight_grad_cache += np.square(layer.dweights)
-                layer.bias_grad_cache += np.square(layer.dbiases)
                 # Perform update and normalize by square-root of cache
                 layer.weights += np.divide(
                     weight_updates,
                     np.add(np.sqrt(layer.weight_grad_cache), self.epsilon))
+            # Check if layer has trainable bias
+            if hasattr(layer, 'dbiases'):
+                bias_updates = np.multiply(-self.learning_rate,
+                                           layer.dbiases)
+                layer.bias_grad_cache += np.square(layer.dbiases)
                 layer.bias += np.divide(
                     bias_updates,
                     np.add(np.sqrt(layer.bias_grad_cache), self.epsilon))
@@ -264,19 +274,23 @@ class RMSProp(BaseOptimizer):
         applying updates to each layer with weights & biases
         """
         for layer in self.layers:
-            # Check that layer has trainable parameters
+            # Check that layer has trainable weights
             if hasattr(layer, 'dweights'):
                 # Update gradient cache
                 layer.weight_grad_cache = np.add(
                     np.multiply(self.rho, layer.weight_grad_cache),
                     np.multiply((1 - self.rho), np.square(layer.dweights)))
-                layer.bias_grad_cache = np.add(
-                    np.multiply(self.rho, layer.bias_grad_cache),
-                    np.multiply((1 - self.rho), np.square(layer.dbiases)))
-                # Perform weight & bias updates
+                # Perform weight updates
                 layer.weights -= np.divide(
                     np.multiply(self.learning_rate, layer.dweights),
                     np.add(np.sqrt(layer.weight_grad_cache), self.epsilon))
+            # Check if layer has trainable bias
+            if hasattr(layer, 'dbiases'):
+                # Update gradient cache
+                layer.bias_grad_cache = np.add(
+                    np.multiply(self.rho, layer.bias_grad_cache),
+                    np.multiply((1 - self.rho), np.square(layer.dbiases)))
+                # Perform bias updates
                 layer.bias -= np.divide(
                     np.multiply(self.learning_rate, layer.dbiases),
                     np.add(np.sqrt(layer.bias_grad_cache), self.epsilon))
@@ -325,40 +339,45 @@ class Adam(BaseOptimizer):
         updates to each layer with weights & biases
         """
         for layer in self.layers:
-            # Check that layer has trainable parameters
+            # Check that layer has trainable weights
             if hasattr(layer, 'dweights'):
                 # Momentum updates
                 layer.weight_momentum = np.multiply(
                     self.beta1, layer.weight_momentum) \
                     + np.multiply((1 - self.beta1), layer.dweights)
-                layer.bias_momentum = np.multiply(
-                    self.beta1, layer.bias_momentum) \
-                    + np.multiply((1 - self.beta1), layer.dbiases)
                 # Gradient cache updates
                 layer.weight_grad_cache = np.multiply(
                     self.beta2, layer.weight_grad_cache) \
                     + np.multiply((1 - self.beta2), np.square(layer.dweights))
-                layer.bias_grad_cache = np.multiply(
-                    self.beta2, layer.bias_grad_cache) \
-                    + np.multiply((1 - self.beta2), np.square(layer.dbiases))
                 # Bias correction
                 weight_mom_unbias = np.divide(
                     layer.weight_momentum,
                     (1 - np.power(self.beta1, self.iteration+1)))
-                bias_mom_unbias = np.divide(
-                    layer.bias_momentum,
-                    (1 - np.power(self.beta1, self.iteration+1)))
                 weight_grads_unbias = np.divide(
                     layer.weight_grad_cache,
                     (1 - np.power(self.beta2, self.iteration+1)))
-                bias_grads_unbias = np.divide(
-                    layer.bias_grad_cache,
-                    (1 - np.power(self.beta2, self.iteration+1)))
-
-                # Perform update on weights & biases
+                # Perform update on weights
                 layer.weights += np.divide(
                     np.multiply(-self.learning_rate, weight_mom_unbias),
                     (np.sqrt(weight_grads_unbias) + self.epsilon))
+            # Check if layer has trainable bias
+            if hasattr(layer, 'dbiases'):
+                # Momentum updates
+                layer.bias_momentum = np.multiply(
+                    self.beta1, layer.bias_momentum) \
+                    + np.multiply((1 - self.beta1), layer.dbiases)
+                # Gradient cache updates
+                layer.bias_grad_cache = np.multiply(
+                    self.beta2, layer.bias_grad_cache) \
+                    + np.multiply((1 - self.beta2), np.square(layer.dbiases))
+                # Bias correction
+                bias_mom_unbias = np.divide(
+                    layer.bias_momentum,
+                    (1 - np.power(self.beta1, self.iteration+1)))
+                bias_grads_unbias = np.divide(
+                    layer.bias_grad_cache,
+                    (1 - np.power(self.beta2, self.iteration+1)))
+                # Perform update on bias
                 layer.bias += np.divide(
                     np.multiply(-self.learning_rate, bias_mom_unbias),
                     (np.sqrt(bias_grads_unbias) + self.epsilon))
