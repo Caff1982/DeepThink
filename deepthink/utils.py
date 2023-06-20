@@ -87,6 +87,34 @@ def one_hot_encode(arr,  k, dtype=np.float32):
     return np.eye(k, dtype=dtype)[arr]
 
 
+def pad_sequences(sequences, maxlen):
+    """
+    Pad sequences to a fixed length maxlen.
+
+    Any sequences longer than maxlen will be truncated.
+    Any sequences shorter than maxlen will be padded with zeros.
+
+    Parameters
+    ----------
+    sequences : list
+        List of sequences to pad.
+    maxlen : int
+        Maximum length of each sequence.
+
+    Returns
+    -------
+    padded_sequences : np.ndarray
+        Padded sequences.
+    """
+    padded_sequences = np.zeros((len(sequences), maxlen), dtype=np.int32)
+    for i, sequence in enumerate(sequences):
+        # Truncate sequences that are too long
+        if len(sequence) > maxlen:
+            sequence = sequence[:maxlen]
+        padded_sequences[i, :len(sequence)] = sequence
+    return padded_sequences
+
+
 def load_mnist_data(filepath=None, test_split=60000,
                     shuffle=True, flat_data=False):
     """

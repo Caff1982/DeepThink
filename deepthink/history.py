@@ -47,8 +47,8 @@ class History:
     """
 
     metric_dict = {
-        'Accuracy': accuracy,
-        'BinaryAccuracy': binary_accuracy,
+        'accuracy': accuracy,
+        'binary_accuracy': binary_accuracy,
         'RMSE': root_mean_squared_error,
         'MAE': mean_absolute_error,
         'MSE': mean_squared_error,
