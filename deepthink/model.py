@@ -10,7 +10,7 @@ class Model:
     Neural network model class.
 
     This is used to construct and train the neural network. The layers
-    are contained in a list, self.layers, created by calling add_layer.
+    are contained in a list, self._layers, created by calling add_layer.
     Once the layers have been created the network can be initialized by
     calling initialize. The API is designed to be similar to Keras.
 
@@ -47,7 +47,7 @@ class Model:
 
         self.dtype = dtype
         # Initialize layers array to store the network's layers
-        self.layers = []
+        self._layers = []
 
     def initialize(self):
         """
@@ -60,17 +60,17 @@ class Model:
         then be used by it to make updates.
         """
         # Set next/previous layer attributes
-        for i, layer in enumerate(self.layers):
+        for i, layer in enumerate(self._layers):
             if i == 0:
                 # First layer, no previous layer
-                layer.next_layer = self.layers[i+1]
-            elif i == len(self.layers)-1:
+                layer.next_layer = self._layers[i+1]
+            elif i == len(self._layers)-1:
                 # Last layer, no next_layer
-                layer.prev_layer = self.layers[i-1]
+                layer.prev_layer = self._layers[i-1]
             else:
                 # Hidden layer
-                layer.prev_layer = self.layers[i-1]
-                layer.next_layer = self.layers[i+1]
+                layer.prev_layer = self._layers[i-1]
+                layer.next_layer = self._layers[i+1]
             # Set data-type for layer
             layer.dtype = self.dtype
 
@@ -80,10 +80,10 @@ class Model:
                 layer.initialize()
             else:
                 # Activation function so outputs same shape as inputs
-                layer.input_shape = self.layers[i-1].output.shape
+                layer.input_shape = self._layers[i-1].output.shape
                 layer.output = np.zeros(layer.input_shape, dtype=self.dtype)
         # Set layers array attribute in optimizer
-        self.optimizer.initialize(self.layers)
+        self.optimizer.initialize(self._layers)
 
     def summary(self, line_length=65):
         """
@@ -94,7 +94,7 @@ class Model:
         line_length : int,default=65
             The maximum length of printed lines
         """
-        n_params = len(self.get_params())
+        num_params = len(self.get_params())
         headers = ['Layer Type', 'Output Shape', 'Param #']
 
         print('Model summary:')
@@ -102,7 +102,7 @@ class Model:
         print(f'{headers[0]} {headers[1]:>28} {headers[2]:>25}')
         print('=' * line_length)
         # Iterate through layers and print a row for each
-        for layer in self.layers:
+        for layer in self._layers:
             output_shape = (None, *layer.output.shape[1:])
             if hasattr(layer, 'weights'):
                 row = [layer, output_shape, layer.weights.size]
@@ -113,7 +113,7 @@ class Model:
             row = [str(x) for x in row]
             print(f'{row[0]:<25} {row[1]:<20} {row[2]:>18s}')
         print('=' * line_length)
-        print(f'Total params: {n_params:,}')
+        print(f'Total params: {num_params}')
 
     def add_layer(self, layer):
         """
@@ -124,7 +124,7 @@ class Model:
         layer : (any layer subclass of BaseLayer)
             The instantiated layer to add to the model.
         """
-        self.layers.append(layer)
+        self._layers.append(layer)
 
     def forward(self, X, training=True):
         """
@@ -143,7 +143,7 @@ class Model:
         numpy.array
             The output predictions from the model.
         """
-        for layer in self.layers:
+        for layer in self._layers:
             if isinstance(layer, (BatchNorm, Dropout)):
                 X = layer.forward(X, training=training)
             else:
@@ -166,13 +166,13 @@ class Model:
             calculated by calling cost.grads().
         """
         # Check last activation layer has backward method
-        if hasattr(self.layers[-1], 'backward'):
-            self.layers[-1].backward(dZ)
+        if hasattr(self._layers[-1], 'backward'):
+            self._layers[-1].backward(dZ)
         else:
-            # If no backward method must be Softmax
-            self.layers[-1].dinputs = dZ
+            # If no backward method must be Softmax activation
+            self._layers[-1].dinputs = dZ
 
-        for layer in reversed(self.layers[:-1]):
+        for layer in reversed(self._layers[:-1]):
             layer.backward(layer.next_layer.dinputs)
 
     def train(self, training_data, validation_data,
@@ -213,7 +213,7 @@ class Model:
         # Get the number of training batches per epoch
         num_batches = (X_train.shape[0] // self.batch_size)
         # initialize history dict to track training progress per epoch
-        self.history = History(self.metrics, verbose=verbose, n_epochs=epochs)
+        self.history = History(self.metrics, n_epochs=epochs, verbose=verbose)
 
         for epoch in range(epochs):
             if shuffle:
@@ -278,27 +278,27 @@ class Model:
         if len_X < self.batch_size:
             # If number of samples is less than batch-size
             # create a zero padded array of length batch-size
-            if self.layers[0].input_shape:
-                # Conv2D layer
-                padded_X = np.zeros(self.layers[0].input_shape)
+            if self._layers[0].input_shape:
+                # Conv2D/Embedding layer
+                padded_X = np.zeros(self._layers[0].input_shape)
             else:
                 # Dense layer
                 padded_X = np.zeros((self.batch_size,
-                                     self.layers[0].n_inputs))
+                                     self._layers[0].n_inputs))
             padded_X[:len_X] = X
             X = padded_X
             # set prediction length to be batch-size
             len_preds = self.batch_size
 
         # Create the array to store predictions
-        predictions = np.zeros((len_preds, self.layers[-1].output.shape[1]))
-        # batch_idx is used as current batch index
-        batch_idx = 0
-        while batch_idx < len_preds:
-            batch_preds = self.forward(X[batch_idx:batch_idx + self.batch_size],
+        predictions = np.zeros((len_preds, self._layers[-1].output.shape[1]))
+        # batch_id is used as current batch index
+        batch_id = 0
+        while batch_id < len_preds:
+            batch_preds = self.forward(X[batch_id:batch_id + self.batch_size],
                                        training=False)
-            predictions[batch_idx:batch_idx + self.batch_size] = batch_preds
-            batch_idx += self.batch_size
+            predictions[batch_id:batch_id + self.batch_size] = batch_preds
+            batch_id += self.batch_size
 
         if len_X < self.batch_size:
             return predictions[:len_X]
@@ -311,7 +311,7 @@ class Model:
         unrolled into a 1D vector.
         """
         params = []
-        for layer in self.layers:
+        for layer in self._layers:
             if hasattr(layer, 'weights'):
                 params.extend(layer.weights.flatten())
             if hasattr(layer, 'bias'):
@@ -324,7 +324,7 @@ class Model:
         weights and biases
         """
         idx = 0
-        for layer in self.layers:
+        for layer in self._layers:
             if hasattr(layer, 'weights'):
                 weights_arr = params[idx:idx+layer.weights.size]
                 layer.weights = weights_arr.reshape(layer.weights.shape)

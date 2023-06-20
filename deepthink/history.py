@@ -45,7 +45,6 @@ class History:
     metric_dict : dict
         A dictionary which maps strings to metric loss function.
     """
-
     metric_dict = {
         'accuracy': accuracy,
         'binary_accuracy': binary_accuracy,
@@ -54,11 +53,11 @@ class History:
         'MSE': mean_squared_error,
         }
 
-    def __init__(self, metrics, verbose=True, n_epochs=None):
+    def __init__(self, metrics, n_epochs, verbose=True):
         self.metrics = metrics
-        self.verbose = verbose
         self.n_epochs = n_epochs
-
+        self.verbose = verbose
+        
         if self.verbose:
             # Store training time for displaying updates
             self.start_time = time.time()
@@ -86,7 +85,7 @@ class History:
             The model's training predictions
         y_val : np.array
             The y-target validation values
-        train_preds : np.array
+        val_preds : np.array
             The model's validation predictions
         """
         # Get and store the model's loss/cost function
@@ -148,14 +147,13 @@ class History:
             fig, axes = plt.subplots(2, figsize=(14, 12))
 
         x_labels = list(range(len(self.history['loss'])))
-        x_ticks = [i for i in range(len(self.history['loss']))]
 
         # Plot the model's loss performance
         axes[0].plot(self.history['loss'], label='Train loss')
         axes[0].plot(self.history['val_loss'], label='Val loss')
         axes[0].set_ylabel('Loss', fontsize='x-large')
         axes[0].legend(fontsize='large', framealpha=1, fancybox=True)
-        axes[0].set_xticks(ticks=x_ticks, labels=x_labels)
+        axes[0].set_xticks(ticks=x_labels, labels=x_labels)
         # MaxNLocator used to dynamically set xtick locations
         axes[0].xaxis.set_major_locator(MaxNLocator(20))
 
@@ -166,12 +164,15 @@ class History:
             axes[1].plot(self.history[f'val_{metric}'], label=f'Val {metric}')
             axes[1].set_ylabel(metric, fontsize='x-large')
             axes[1].legend(fontsize='large', framealpha=1, fancybox=True)
-            axes[1].set_xticks(ticks=x_ticks, labels=x_labels)
+            axes[1].set_xticks(ticks=x_labels, labels=x_labels)
             axes[1].xaxis.set_major_locator(MaxNLocator(20))
 
         plt.xlabel('Epoch', fontsize='large')
         plt.legend(fontsize='large', framealpha=1, fancybox=True)
         if save_fname:
-            plt.savefig(save_fname)
+            try:
+                plt.savefig(save_fname)
+            except Exception as e:
+                print(f'Failed to save image: {e}')
         if display_image:
             plt.show()
