@@ -170,7 +170,7 @@ def load_mnist_data(filepath=None, test_split=60000,
     X = dataset['data'].values.astype(np.float32)
     y = dataset['target'].values.astype(np.int8)
 
-    # PNormalize image values to 0-1
+    # Normalize image values to 0-1
     X /= 255.0
     # One-hot encode labels and convert to integer
     y_new = one_hot_encode(y, k=10, dtype=np.int8)
@@ -183,7 +183,7 @@ def load_mnist_data(filepath=None, test_split=60000,
         shuffle_index = np.random.permutation(test_split)
         X_train, y_train = X_train[shuffle_index], y_train[shuffle_index]
     if not flat_data:
-        # Reshape from 1D to image dimensions
+        # Reshape from 1D to image dimensions, channels first
         X_train = X_train.reshape(-1, 1, 28, 28)
         X_test = X_test.reshape(-1, 1, 28, 28)
 

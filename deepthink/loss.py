@@ -1,7 +1,41 @@
 import numpy as np
 
 
-class CategoricalCrossEntropy:
+class BaseLoss:
+    """
+    Base class for loss functions.
+
+    This class uses the __call__ method to call the "loss" method
+    and resize the input arrays if necessary. This allows the loss
+    subclasses to be called directly without having to call the
+    "loss" method.
+
+    All loss functions should inherit from this class and implement
+    "loss" and "grads" methods. The "loss" method should take two
+    arguments, y_true and y_hat, and return the loss value. If the
+    arrays are not the same length then both will be resized to match.
+    """
+
+    def __call__(self, y_true, y_hat):
+        # If arrays are not the same length then resize
+        if not y_true.shape != y_hat.shape:
+            min_len = min(y_true.shape[0], y_hat.shape[0])
+            y_true = y_true[:min_len]
+            y_hat = y_hat[:min_len]
+        return self.loss(y_true, y_hat)
+
+    def loss(self, y_true, y_hat):
+        raise NotImplementedError(
+            'All loss classes must implement a "loss" method'
+        )
+
+    def grads(self):
+        raise NotImplementedError(
+            'All loss classes must implement a "grads" method'
+        )
+
+
+class CategoricalCrossEntropy(BaseLoss):
     """
     Categorical Cross Entropy, (CCE).
 
@@ -18,10 +52,7 @@ class CategoricalCrossEntropy:
     """
 
     def __str__(self):
-        return 'Categorical Cross-entropy (CCE)'
-
-    def __call__(self, y_true, y_hat):
-        return self.loss(y_true, y_hat)
+        return 'CategoricalCrossentropy'
 
     def loss(self, y_true, y_hat, epsilon=1e-7):
         """
@@ -29,9 +60,9 @@ class CategoricalCrossEntropy:
         and predictions.
 
         Labels are expected to be one-hot encoded arrays and
-        predictions should be the output of a softmax layer. Both input
-        arrays should be the same length. Both predictions and labels
-        are stored as instance attributes for use with "grads" method.
+        predictions should be the output of a softmax layer.
+        Both predictions and labels are stored as instance attributes
+        for use with "grads" method.
 
         Parameters
         ----------
@@ -47,8 +78,6 @@ class CategoricalCrossEntropy:
         cce_loss: float
             The crossentropy loss between predictions and labels
         """
-
-        assert y_true.shape == y_hat.shape
         # Clip values to avoid errors
         y_hat = np.clip(y_hat, epsilon, 1-epsilon)
         # Store labels and predictions for use in backprop
@@ -67,7 +96,7 @@ class CategoricalCrossEntropy:
         return (self.y_hat - self.y_true) / self.y_true.shape[0]
 
 
-class BinaryCrossEntropy:
+class BinaryCrossEntropy(BaseLoss):
     """
     Binary Cross Entropy, (BCE).
 
@@ -80,10 +109,7 @@ class BinaryCrossEntropy:
     """
 
     def __str__(self):
-        return 'Binary Cross-entropy (BCE)'
-
-    def __call__(self, y_true, y_hat):
-        return self.loss(y_true, y_hat)
+        return 'BinaryCrossentropy'
 
     def loss(self, y_true, y_hat, epsilon=1e-7):
         """
@@ -91,9 +117,8 @@ class BinaryCrossEntropy:
         and predictions.
 
         Labels are expected to be a binary array and predictions
-        should be the output of a sigmoid layer. Both input arrays
-        should be the same length. Both predictions and labels are
-        stored as instance attributes for use with "grads" method.
+        should be between zero and one. Both predictions and labels
+        are stored as instance attributes for use with "grads" method.
 
         Parameters
         ----------
@@ -109,7 +134,6 @@ class BinaryCrossEntropy:
         bce_loss: float
             The binary crossentropy loss between predictions and labels
         """
-        assert y_true.shape == y_hat.shape
         # Clip values to avoid errors
         y_hat_clip = np.clip(y_hat, epsilon, 1-epsilon)
         # Store labels and predictions for use in backprop
@@ -131,17 +155,27 @@ class BinaryCrossEntropy:
                 / self.y_true.shape[0])
 
 
-class MeanSquaredError:
+class MeanSquaredError(BaseLoss):
+    """
+    Mean Squared Error, (MSE).
 
-    def __call__(self, y_true, y_hat):
-        return self.loss(y_true, y_hat)[0]
+    Mean squared error is a loss function that measures the
+    difference between the predicted and true values for
+    a regression task. It is calculated as the mean of the
+    squared differences between the predicted and true values.
+
+    References
+    ----------
+    - https://en.wikipedia.org/wiki/Mean_squared_error
+    
+    """
 
     def __str__(self):
-        return 'Mean Squared Error (MSE)'
+        return 'MeanSquaredError'
 
     def loss(self, y_true, y_hat):
         """
-        Return the Mean Squared Error (MSE) loss  between labels and
+        Return the Mean Squared Error (MSE) loss between labels and
         predictions. Both arrays should be the same length.
 
         Parameters
@@ -156,11 +190,14 @@ class MeanSquaredError:
         np.array
             The MSE loss between predictions and labels.
         """
-        assert y_true.shape == y_hat.shape
+        # Store labels and predictions for use in backprop
         self.y_true = y_true
         self.y_hat = y_hat
-        self.output = ((y_true - y_hat)**2).mean(axis=0)
+        self.output = np.square(y_true - y_hat).mean()
         return self.output
 
     def grads(self):
+        """
+        Return the gradients/derivative for y_true and y_hat.
+        """
         return -2 * (self.y_true - self.y_hat) / self.y_true.shape[0]

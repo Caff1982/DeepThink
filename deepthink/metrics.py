@@ -19,7 +19,7 @@ def mean_squared_error(y_true, y_hat):
         The MSE loss between predictions and labels.
     """
     assert y_true.shape == y_hat.shape
-    return np.mean((y_true - y_hat)**2)
+    return np.square(y_true - y_hat).mean()
 
 
 def root_mean_squared_error(y_true, y_hat):
@@ -40,7 +40,7 @@ def root_mean_squared_error(y_true, y_hat):
         The RMSE loss between predictions and labels.
     """
     assert y_true.shape == y_hat.shape
-    return np.mean(np.sqrt((y_true - y_hat)**2))
+    return np.mean(np.sqrt(np.square(y_true - y_hat)))
 
 
 def mean_absolute_error(y_true, y_hat):

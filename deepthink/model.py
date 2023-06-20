@@ -117,7 +117,7 @@ class Model:
 
     def add_layer(self, layer):
         """
-        Add a layer instance to the layers array.
+        Add a layer instance to the _layers array.
 
         Parameters
         ----------

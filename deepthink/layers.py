@@ -85,7 +85,7 @@ class Dense(BaseLayer):
         self.input_shape = input_shape
 
     def __str__(self):
-        return 'Dense Layer'
+        return f'Dense({self.n_neurons})'
 
     def initialize(self):
         """
@@ -408,15 +408,15 @@ class EmbeddingLayer(BaseLayer):
         self.weights = initialize_weights(weights_shape,
                                           self.weight_init,
                                           self.dtype)
-
         self.output = np.zeros((self.input_shape[0],
                                 self.emb_dims,
                                 self.seq_len))
-
         # Initialize arrays to store optimizer momentum values
         self.weight_momentum = np.zeros(weights_shape, dtype=self.dtype)
         # Initialize arrays to store optimizer gradient cache
         self.weight_grad_cache = np.zeros(weights_shape, dtype=self.dtype)
+        # Placeholder for input grads, not used in Embedding layer
+        self.dinputs = None
 
     def forward(self, X):
         """
@@ -434,6 +434,7 @@ class EmbeddingLayer(BaseLayer):
         """
         self.input = X
         self.output = self.weights[self.input]
+        # Transpose to ensure channels first
         return self.output.transpose(0, 2, 1)
 
     def backward(self, grads):
@@ -445,7 +446,7 @@ class EmbeddingLayer(BaseLayer):
 
         Parameters
         ----------
-        grads : array-like, shape (batch_size, input_length, output_dim)
+        grads : array-like
             Gradients from the subsequent layer.
         """
         self.dweights = np.zeros_like(self.weights)
@@ -568,12 +569,12 @@ class MaxPooling(BaseLayer):
         ih2 = (ih * self.stride) + iy
         iw2 = (iw * self.stride) + ix
         # Use the indices to allocate the gradients correctly
-        self.dinputs[im, ic, ih2, iw2] = grads[im, ic, ih, iw].flatten()
+        self.dinputs[im, ic, ih2, iw2] = grads[im, ic, ih, iw]
 
         return self.dinputs
 
 
-class GlobalAveragePoolingLayer:
+class GlobalAveragePooling(BaseLayer):
     """
     Global Average Pooling layer.
 
@@ -592,11 +593,10 @@ class GlobalAveragePoolingLayer:
         """
         Initialize the global average pooling layer.
         """
-        if self.prev_layer:
-            self.input_shape = self.prev_layer.output.shape
-        else:
-            raise Exception('GlobalAveragePooling cannot be the first layer')
+        if not self.prev_layer:
+            raise ValueError('GlobalAveragePooling cannot be the first layer')
 
+        self.input_shape = self.prev_layer.output.shape
         self.output = np.zeros((self.input_shape[0], self.input_shape[1]))
 
     def forward(self, X):
@@ -642,7 +642,7 @@ class Flatten(BaseLayer):
     """
     Flattens the input array, batch-size is the only dimension
     preserved. Used to reshape output from conv/pooling layers to
-    input for  a full-connected Dense layer.
+    be used as input for a Dense layer.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -719,8 +719,8 @@ class Dropout(BaseLayer):
         X: numpy.ndarray
             The input tensor to which dropout is applied.
         training : bool,default=True
-            If set to true, applies dropout to the input during
-            training mode. If set to false, no dropout is applied
+            If set to True, applies dropout to the input during
+            training mode. If set to False, no dropout is applied
             during inference mode.
 
         Returns
@@ -885,7 +885,7 @@ class BatchNorm(BaseLayer):
             mean = self.running_mean
             self.var = self.running_var
         # Perform forward pass and store attributes for backpass
-        self.X_mu = (X - mean)
+        self.X_mu = X - mean
         self.X_norm = self.X_mu / np.sqrt(self.var + self.epsilon)
         self.output = self.weights * self.X_norm + self.bias
         return self.output
@@ -906,7 +906,7 @@ class BatchNorm(BaseLayer):
         2. The total number of elements in the input, Nt, is
            calculated based on the input shape. If the input has 4
            dimensions (i.e. it's a convolutional layer), Nt is
-           calculated as N * H *W. If the input has 2 dimensions
+           calculated as N * H * W. If the input has 2 dimensions
            (i.e. it's a fully-connected layer), Nt is simply N.
         3. The gradients of the loss with respect to the inputs are
            computed by multiplying Nt by the gradients, subtracting

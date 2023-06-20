@@ -10,12 +10,12 @@ class BaseOptimizer:
     lr_decay : float,default=None
         Learning rate decay, the amount to decay the learning rate by
         each epoch. Uses exponential decay:
-        lr = lr0 * lr_decay**iteration
+        - lr = lr0 * lr_decay**iteration
         Suggested values are >=0.9.
     init_lr : float,default=None
         The initial learning rate. This is stored as an attribute to
         enable learning rate decay.
-    min_lr : float,default=None
+    min_lr : float,default=0.0
         The minimum learning-rate value to use if using learning-rate
         decay.
     iteration : int,default=0
@@ -25,7 +25,7 @@ class BaseOptimizer:
         This is added during initialization.
     """
     def __init__(self, lr_decay=None, init_lr=None,
-                 min_lr=0.0, iteration=0, layers=[]):
+                 min_lr=0.0, iteration=0, layers=None):
         self.lr_decay = lr_decay
         self.init_lr = init_lr
         self.min_lr = min_lr
@@ -157,7 +157,7 @@ class NAG(BaseOptimizer):
     def update(self):
         """
         Perform one batch update by looping through layers and applying
-        updates to each layer with weights & biases
+        updates to each layer with weights & biases.
         """
         for layer in self.layers:
             # Check that layer has trainable weights
@@ -180,7 +180,7 @@ class NAG(BaseOptimizer):
                 layer.bias -= np.subtract(
                     np.multiply(self.momentum, old_b_mom),
                     np.multiply((1 + self.momentum), layer.bias_momentum))
-    
+
         # Update learning-rate and iteration
         self.on_batch_end()
 
