@@ -6,8 +6,7 @@ from matplotlib.ticker import MaxNLocator
 from deepthink.metrics import (mean_squared_error,
                                root_mean_squared_error,
                                mean_absolute_error,
-                               accuracy,
-                               binary_accuracy)
+                               accuracy)
 
 
 class History:
@@ -47,7 +46,6 @@ class History:
     """
     metric_dict = {
         'accuracy': accuracy,
-        'binary_accuracy': binary_accuracy,
         'RMSE': root_mean_squared_error,
         'MAE': mean_absolute_error,
         'MSE': mean_squared_error,
@@ -162,7 +160,7 @@ class History:
             metric = self.metrics[1]
             axes[1].plot(self.history[metric], label=f'Train {metric}')
             axes[1].plot(self.history[f'val_{metric}'], label=f'Val {metric}')
-            axes[1].set_ylabel(metric, fontsize='x-large')
+            axes[1].set_ylabel(metric.capitalize(), fontsize='x-large')
             axes[1].legend(fontsize='large', framealpha=1, fancybox=True)
             axes[1].set_xticks(ticks=x_labels, labels=x_labels)
             axes[1].xaxis.set_major_locator(MaxNLocator(20))

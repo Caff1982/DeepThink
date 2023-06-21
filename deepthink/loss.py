@@ -18,7 +18,7 @@ class BaseLoss:
 
     def __call__(self, y_true, y_hat):
         # If arrays are not the same length then resize
-        if not y_true.shape != y_hat.shape:
+        if y_true.shape != y_hat.shape:
             min_len = min(y_true.shape[0], y_hat.shape[0])
             y_true = y_true[:min_len]
             y_hat = y_hat[:min_len]
