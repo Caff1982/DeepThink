@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 from tqdm import tqdm
 
@@ -334,28 +336,55 @@ class Model:
                 layer.bias = bias_arr.reshape(layer.bias.shape)
                 idx += layer.bias.size
 
-    def save(self, filepath):
+    def save(self, filepath, weights_only=False):
         """
-        Save the model's weights & biases to specified filepath.
+        Save the model's weights & biases (and optionally the entire model)
+        to the specified filepath.
 
-        File-type should be '.npy'.
+        File-type should be '.npy' for weights and biases, and '.pkl'
+        for the entire model.
 
         Parameters
         ----------
         filepath : str
             The location to save the model's parameters.
+        weights_only : bool, optional
+            Whether to save only the weights and biases or the entire model
+            (default is False).
         """
-        params = self.get_params()
-        np.save(filepath, params)
+        if weights_only:
+            params = self.get_params()
+            np.save(filepath, params)
+        else:
+            with open(filepath, 'wb') as file:
+                pickle.dump(self, file)
 
-    def load(self, filepath):
+    def load_weights(self, filepath):
         """
-        Load model parameters from specified filepath.
+        Load model weights and biases from the specified filepath.
 
         Parameters
         ----------
         filepath : str
-            The location to load the model's parameters from.
+            The location to load the model's weights and biases from.
         """
         params = np.load(filepath)
         self.set_params(params)
+
+    @staticmethod
+    def load_model(filepath):
+        """
+        Load the entire model from the specified filepath.
+
+        Parameters
+        ----------
+        filepath : str
+            The location to load the entire model from.
+
+        Returns
+        -------
+        Model
+            The loaded model object.
+        """
+        with open(filepath, 'rb') as file:
+            return pickle.load(file)
