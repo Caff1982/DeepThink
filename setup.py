@@ -7,7 +7,7 @@ long_description = (this_directory / 'README.md').read_text()
 
 setup(
     name='deepthink',
-    version='0.2.3 ',
+    version='0.2.1 ',
     description='Deep Learning library',
     long_description=long_description,
     long_description_content_type='text/markdown',
