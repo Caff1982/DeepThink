@@ -11,8 +11,12 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 class TestActivations(unittest.TestCase):
 
     def setUp(self):
-        self.inputs = np.array([-10, -1, 0.1, 1, 10])
+        self.inputs = np.random.randn(2, 3, 5)
         self.grads = np.ones_like(self.inputs)
+
+        # For Softmax inputs should not have channel dimension
+        # because it expected to be used as a final layer
+        self.inputs_softmax = np.random.randn(2, 5)
 
     def test_sigmoid(self):
         self._test_activation(Sigmoid(),
@@ -37,12 +41,12 @@ class TestActivations(unittest.TestCase):
                               tf.keras.activations.tanh)
 
     def test_softmax(self):
-        # Our Softmax only has forward pass, and also requires inputs
-        # to be 2D column vectors.
-        input_2D = self.inputs.reshape(1, -1)
-        tensor_2D = tf.convert_to_tensor(input_2D)
-        expected_outputs = tf.keras.activations.softmax(tensor_2D).numpy()
-        np.testing.assert_almost_equal(Softmax().forward(input_2D),
+        # Our Softmax only has forward pass, since it is used in
+        # conjunction with CategoricalCrossEntropy loss, which
+        # has its own backward pass.
+        input_tensor = tf.convert_to_tensor(self.inputs_softmax)
+        expected_outputs = tf.keras.activations.softmax(input_tensor).numpy()
+        np.testing.assert_almost_equal(Softmax().forward(self.inputs_softmax),
                                        expected_outputs,
                                        decimal=6)
 

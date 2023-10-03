@@ -17,25 +17,29 @@ from deepthink.activations import Softmax
 tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 
+def _ref_softmax(x):
+    m = np.max(x)
+    e = np.exp(x - m)
+    return e / np.sum(e)
+
+
 class TestLosses(unittest.TestCase):
 
     def setUp(self):
         # For MeanSquaredError
-        self.y_true_mse = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
-        self.y_hat_mse = np.array([1.5, 2.5, 2.5, 3.5, 4.5])
+        self.y_true_mse = np.random.random((5))
+        self.y_hat_mse = np.random.random((5))
 
         # For BinaryCrossEntropy
-        self.y_true_bce = np.array([0, 1, 0, 1, 0])
-        self.y_hat_bce = np.array([0.1, 0.2, 0.2, 0.3, 0.2])
+        self.y_true_bce = np.random.randint(2, size=(5))
+        self.y_hat_bce = np.random.random((5))
 
-        # For CategoricalCrossEntropy (assuming binary classes for simplicity)
-        self.y_true_ce = np.array([[1, 0], [0, 1], [1, 0], [0, 1], [1, 0]])
-        self.y_hat_ce_logits = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [5, 10]])
-        self.y_hat_ce_softmax = np.array([[0.26894142, 0.73105858],
-                                        [0.26894142, 0.73105858],
-                                        [0.26894142, 0.73105858],
-                                        [0.26894142, 0.73105858],
-                                        [0.00669285, 0.99330715]])
+        # For CategoricalCrossEntropy (assume number of classes is 4)
+        self.y_true_ce = np.random.randint(4, size=(5, 4))
+        self.y_hat_ce_logits = np.random.random((5, 4)) * 5
+        self.y_hat_ce_softmax = np.zeros((5, 4))
+        for i in range(5):
+            self.y_hat_ce_softmax[i] = _ref_softmax(self.y_hat_ce_logits[i])
 
     def test_mean_squared_error(self):
         self._test_loss(MeanSquaredError(), keras_MSE(),
