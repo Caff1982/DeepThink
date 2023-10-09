@@ -485,7 +485,9 @@ class MaxPooling(BaseLayer):
         """
         Initialize settings to prepare the layer for training
         """
-        # Use prev_layer to get input_shape if not first layer
+        if self.prev_layer is None and self.input_shape is None:
+            raise ValueError('MaxPooling cannot be the first layer')
+
         if self.input_shape is None:
             self.input_shape = self.prev_layer.output.shape
 
@@ -593,10 +595,12 @@ class GlobalAveragePooling(BaseLayer):
         """
         Initialize the global average pooling layer.
         """
-        if not self.prev_layer:
+        if self.prev_layer is None and self.input_shape is None:
             raise ValueError('GlobalAveragePooling cannot be the first layer')
 
-        self.input_shape = self.prev_layer.output.shape
+        if self.input_shape is None:
+            self.input_shape = self.prev_layer.output.shape
+
         self.output = np.zeros((self.input_shape[0], self.input_shape[1]))
 
     def forward(self, X):
