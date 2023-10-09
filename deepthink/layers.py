@@ -585,7 +585,8 @@ class GlobalAveragePooling(BaseLayer):
     axis : int or tuple, default=-1
         The axis or axes along which the pooling is applied.
     """
-    def __init__(self, axis=-1):
+    def __init__(self, axis=-1, **kwargs):
+        super().__init__(**kwargs)
         self.axis = axis
 
     def __str__(self):
