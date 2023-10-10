@@ -576,7 +576,7 @@ class MaxPooling(BaseLayer):
         return self.dinputs
 
 
-class GlobalAveragePooling(BaseLayer):
+class GlobalAveragePooling1D(BaseLayer):
     """
     Global Average Pooling layer.
 
