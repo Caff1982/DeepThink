@@ -729,7 +729,12 @@ class Flatten(BaseLayer):
         """
         Initialize settings to prepare the layer for training
         """
-        self.input_shape = self.prev_layer.output.shape
+        if self.prev_layer is None and self.input_shape is None:
+            raise ValueError('Flatten cannot be the first layer')
+
+        if self.input_shape is None:
+            self.input_shape = self.prev_layer.output.shape
+
         self.output = np.zeros(
             self.input_shape,
             dtype=self.dtype).reshape((self.input_shape[0], -1))
@@ -782,7 +787,12 @@ class Dropout(BaseLayer):
         """
         Initialize settings to prepare the layer for training
         """
-        self.input_shape = self.prev_layer.output.shape
+        if self.prev_layer is None and self.input_shape is None:
+            raise ValueError('Dropout cannot be the first layer')
+
+        if self.input_shape is None:
+            self.input_shape = self.prev_layer.output.shape
+
         self.output = np.zeros(self.input_shape, dtype=self.dtype)
 
     def forward(self, X, training=True):
@@ -880,8 +890,12 @@ class BatchNorm(BaseLayer):
         - self.running_mean and self.running_var store the running
           mean and variance which are used during inference.
         """
+        if self.prev_layer is None and self.input_shape is None:
+            raise ValueError('BatchNorm cannot be the first layer')
+
         if self.input_shape is None:
             self.input_shape = self.prev_layer.output.shape
+
         # Check input-dims to set params for 2 or 4 input dims
         if len(self.input_shape) == 4:
             self.N, self.C, self.H, self.W = self.input_shape
