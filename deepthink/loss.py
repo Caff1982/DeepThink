@@ -167,7 +167,7 @@ class MeanSquaredError(BaseLoss):
     References
     ----------
     - https://en.wikipedia.org/wiki/Mean_squared_error
-    
+
     """
 
     def __str__(self):
@@ -193,11 +193,11 @@ class MeanSquaredError(BaseLoss):
         # Store labels and predictions for use in backprop
         self.y_true = y_true
         self.y_hat = y_hat
-        self.output = np.square(y_true - y_hat).mean()
+        self.output = np.square(y_true - y_hat).mean() 
         return self.output
 
     def grads(self):
         """
         Return the gradients/derivative for y_true and y_hat.
         """
-        return -2 * (self.y_true - self.y_hat) / self.y_true.shape[0]
+        return -2 * (self.y_true - self.y_hat) / np.prod(self.y_true.shape)
