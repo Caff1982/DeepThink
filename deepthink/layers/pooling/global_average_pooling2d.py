@@ -1,10 +1,9 @@
 import numpy as np
 
-from deepthink.utils import initialize_weights
-from deepthink.layers.layer import BaseLayer
+from deepthink.layers.pooling.base_pooling import BasePooling
 
 
-class GlobalAveragePooling2D(BaseLayer):
+class GlobalAveragePooling2D(BasePooling):
     """
     Global Average Pooling 2D layer.
 
@@ -17,10 +16,9 @@ class GlobalAveragePooling2D(BaseLayer):
     axes : tuple, default=(-2, -1)
         The axes along which the pooling is applied.
     """
-    def __init__(self, axes=(-2, -1), input_shape=None, **kwargs):
+    def __init__(self, axes=(-2, -1), **kwargs):
         super().__init__(**kwargs)
         self.axes = axes
-        self.input_shape = input_shape
 
     def __str__(self):
         return 'GlobalAveragePooling2D'
@@ -29,20 +27,12 @@ class GlobalAveragePooling2D(BaseLayer):
         """
         Initialize the global average pooling 2D layer.
         """
-        if self.prev_layer is None and self.input_shape is None:
-            raise ValueError(
-                'GlobalAveragePooling2D cannot be the first layer'
-            )
-
-        if self.input_shape is None:
-            self.input_shape = self.prev_layer.output.shape
-
         # The output shape will be (batch_size, num_channels)
         self.output = np.zeros((self.input_shape[0], self.input_shape[1]))
 
-    def forward(self, X):
+    def forward(self, inputs):
         """
-        Perform the forward pass on inputs X.
+        Perform the forward pass on input tensor.
 
         Parameters
         ----------
@@ -54,8 +44,8 @@ class GlobalAveragePooling2D(BaseLayer):
         output : np.array, shape (batch_size, features)
             Average-pooled output tensor.
         """
-        self.input = X
-        self.output = np.mean(X, axis=self.axes)
+        self.input = inputs
+        self.output = np.mean(inputs, axis=self.axes)
         return self.output
 
     def backward(self, grads):

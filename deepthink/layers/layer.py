@@ -50,7 +50,7 @@ class BaseLayer:
             'All BaseLayer subclasses must implement initialize method'
         )
 
-    def forward(self, X):
+    def forward(self, inputs):
         raise NotImplementedError(
             'All BaseLayer subclasses must implement forward method'
         )

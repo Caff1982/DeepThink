@@ -3,7 +3,8 @@ from deepthink.layers.core.embedding import Embedding
 from deepthink.layers.core.flatten import Flatten
 from deepthink.layers.convolution.conv1d import Conv1D
 from deepthink.layers.convolution.conv2d import Conv2D
-from deepthink.layers.pooling.max_pooling import MaxPooling
+from deepthink.layers.pooling.max_pooling1d import MaxPooling1D
+from deepthink.layers.pooling.max_pooling2d import MaxPooling2D
 from deepthink.layers.pooling.global_average_pooling1d import GlobalAveragePooling1D
 from deepthink.layers.pooling.global_average_pooling2d import GlobalAveragePooling2D
 from deepthink.layers.regularization.dropout import Dropout

@@ -1,10 +1,9 @@
 import numpy as np
 
-from deepthink.utils import initialize_weights
-from deepthink.layers.layer import BaseLayer
+from deepthink.layers.pooling.base_pooling import BasePooling
 
 
-class GlobalAveragePooling1D(BaseLayer):
+class GlobalAveragePooling1D(BasePooling):
     """
     Global Average Pooling layer.
 
@@ -17,10 +16,9 @@ class GlobalAveragePooling1D(BaseLayer):
     axis : int or tuple, default=-1
         The axis or axes along which the pooling is applied.
     """
-    def __init__(self, axis=-1, input_shape=None, **kwargs):
+    def __init__(self, axis=-1, **kwargs):
         super().__init__(**kwargs)
         self.axis = axis
-        self.input_shape = input_shape
 
     def __str__(self):
         return 'GlobalAveragePooling1D'
@@ -29,23 +27,16 @@ class GlobalAveragePooling1D(BaseLayer):
         """
         Initialize the global average pooling layer.
         """
-        if self.prev_layer is None and self.input_shape is None:
-            raise ValueError(
-                'GlobalAveragePooling1D cannot be the first layer'
-            )
-
-        if self.input_shape is None:
-            self.input_shape = self.prev_layer.output.shape
-
+        # The output shape will be (batch_size, num_channels)
         self.output = np.zeros((self.input_shape[0], self.input_shape[1]))
 
-    def forward(self, X):
+    def forward(self, inputs):
         """
-        Perform the forward pass on inputs X.
+        Perform the forward pass on input tensor.
 
         Parameters
         ----------
-        X : np.array, shape (batch_size, features, seq_len)
+        inputs : np.array, shape (batch_size, features, seq_len)
             Input tensor.
 
         Returns
@@ -53,8 +44,8 @@ class GlobalAveragePooling1D(BaseLayer):
         output : np.array, shape (batch_size, features)
             Average-pooled output tensor.
         """
-        self.input = X
-        self.output = np.mean(X, axis=self.axis)
+        self.input = inputs
+        self.output = np.mean(inputs, axis=self.axis)
         return self.output
 
     def backward(self, grads):
