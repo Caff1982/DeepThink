@@ -19,7 +19,9 @@ class BasePooling(BaseLayer):
         # If the _input_shape is not set, infer it from the previous layer
         if self._input_shape is None:
             if self.prev_layer is None:
-                raise ValueError('Pooling layer cannot be used as the first layer')
+                raise ValueError(
+                    'Pooling layer cannot be used as the first layer'
+                )
             return self.prev_layer.output.shape
         return self._input_shape
 
