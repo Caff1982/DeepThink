@@ -65,6 +65,105 @@ def initialize_weights(shape, init_type, dtype=np.float32):
         raise Exception(f'Weight init type "{init_type}" not recognized')
 
 
+def get_strided_view_1D(arr, view_shape, stride):
+    """
+    Return a view of an array using Numpy's as_strided
+    slide-trick.
+
+    Computationally efficient way to get all the kernel windows
+    to be used in the convolution operation. Takes 3D tensor as
+    input with shape (batch, depth, seq-len) and outputs 4D tensor
+    with shape (batch, seq-len, depth, kernel-size).
+
+    Parameters
+    ----------
+    arr : np.array
+        The array/tensor to perform the operation on.
+    view_shape : tuple
+        The shape of the view to be returned.
+    stride : int
+        The step size between each view.
+
+    Returns
+    -------
+    view : np.array
+        The 4D view to be used in forward/backward pass.
+    """
+    # strides returns the byte-step for each dim in memory
+    s0, s1, s2 = arr.strides
+    strides = (s0, stride * s2, s1, s2)
+    # Return a view of the array with the given shape and strides
+    return np.lib.stride_tricks.as_strided(
+        arr, view_shape, strides=strides, writeable=True)
+
+
+def get_strided_view_2D(arr, view_shape, stride):
+    """
+    Return a view of an array using Numpy's as_strided
+    slide-trick.
+
+    Computationally efficient way to get all the kernel windows
+    to be used in the convolution operation. Takes 4D tensor with
+    shape (batch, depth, img-size, img-size) as input and outputs
+    a 6D tensor with shape:
+    (batch, img-size, img-size, depth, kernel-size, kernel-size).
+
+    Parameters
+    ----------
+    arr : np.array
+        The array/tensor to perform the operation on.
+    view_shape : tuple
+        The shape of the view to be returned.
+    stride : int
+        The step size between each view.
+
+    Returns
+    -------
+    view : np.array
+        The 6D view to be used in forward/backward pass
+    """
+    # strides returns the byte-step for each dim in memory
+    s0, s1, s2, s3 = arr.strides
+    strides = (s0, stride * s2, stride * s3, s1, s2, s3)
+    # Return a view of the array with the given shape and strides
+    return np.lib.stride_tricks.as_strided(
+        arr, view_shape, strides=strides, writeable=True)
+
+
+def get_strided_view_3D(arr, view_shape, stride):
+    """
+    Return a view of an array using Numpy's as_strided
+    slide-trick.
+
+    Computationally efficient way to get all the kernel windows
+    to be used in the convolution operation. Takes 5D tensor with
+    shape (batch, depth, img-size, img-size, img-size) as input and
+    outputs a 8D tensor with shape:
+    (batch, img-size, img-size, img-size, depth, kernel-size,
+    kernel-size, kernel-size).
+
+    Parameters
+    ----------
+    arr : np.array
+        The array/tensor to perform the operation on.
+    view_shape : tuple
+        The shape of the view to be returned.
+    stride : int
+        The step size between each view.
+    
+    Returns
+    -------
+    view : np.array
+        The 8D view to be used in forward/backward pass
+    """
+    # strides returns the byte-step for each dim in memory
+    s0, s1, s2, s3, s4 = arr.strides
+    strides = (s0, stride * s2, stride * s3, stride * s4, s1, s2, s3, s4)
+    # Return a view of the array with the given shape and strides
+    return np.lib.stride_tricks.as_strided(
+        arr, view_shape, strides=strides, writeable=True)
+
+
 def one_hot_encode(arr,  k, dtype=np.float32):
     """
     Takes 1D array of target integer values and return a

@@ -21,8 +21,6 @@ class MaxPooling1D(BasePooling):
         The size of the pooling window.
     stride : int
         The step size between each pooling window.
-    padding : int
-        The amount of zero padding to add to the input image
     """
     def __init__(self, pool_size=2, stride=2, **kwargs):
         super().__init__(
@@ -87,9 +85,20 @@ class MaxPooling1D(BasePooling):
 
     def backward(self, grads):
         """
-        Perform one backward pass.
+        Perform backward pass.
 
-        Calculates partial derivatives w.r.t. inputs.
+        Calculates partial derivatives w.r.t. inputs and stores them in
+        the `dinputs` instance variable.
+
+        Parameters
+        ----------
+        grads : np.array
+            Gradients of the subsequent layer.
+
+        Returns
+        -------
+        dinputs : np.array
+            Gradients of the inputs.
         """
         # Initialize empty array
         self.dinputs = np.zeros(self.input_shape)
