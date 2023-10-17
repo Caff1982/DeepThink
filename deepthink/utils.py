@@ -150,7 +150,7 @@ def get_strided_view_3D(arr, view_shape, stride):
         The shape of the view to be returned.
     stride : int
         The step size between each view.
-    
+
     Returns
     -------
     view : np.array
@@ -252,6 +252,8 @@ def load_mnist_data(filepath=None, test_split=60000,
         A tuple of (X_test, y_test), both numpy arrays, for test X-data
         and labels.
     """
+    import pandas as pd
+    
     if filepath:
         # Download dataset if file does not already exist
         if not os.path.exists(filepath):

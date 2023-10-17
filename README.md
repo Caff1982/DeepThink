@@ -23,7 +23,7 @@ Here is a simple example of how to use DeepThink to train a deep learning model:
 
 ```python
 from deepthink.optimizers import Adam
-from deepthink.layers import Dense, Conv2D, MaxPooling, Flatten
+from deepthink.layers import Dense, Conv2D, MaxPooling2D, Flatten
 from deepthink.model import Model
 from deepthink.activations import ReLU,  Softmax
 from deepthink.utils import load_mnist_data
@@ -39,7 +39,7 @@ model = Model(optimizer, cost=CategoricalCrossEntropy(), batch_size=64)
 model.add_layer(Conv2D(kernel_size=5, n_filters=8,
                        input_shape=(64, 1, 28, 28)))
 model.add_layer(ReLU())
-model.add_layer(MaxPooling())
+model.add_layer(MaxPooling2D())
 model.add_layer(Flatten())
 model.add_layer(Dense(16))
 model.add_layer(ReLU())
