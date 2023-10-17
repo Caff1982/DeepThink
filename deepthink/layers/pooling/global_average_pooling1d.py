@@ -15,10 +15,17 @@ class GlobalAveragePooling1D(BasePooling):
     ----------
     axis : int or tuple, default=-1
         The axis or axes along which the pooling is applied.
+    keep_dims : bool, default=False
+        Whether to keep the spatial dimensions or not. When False,
+        the spatial dimensions are removed and the output shape is
+        (batch_size, num_channels). When True, the spatial dimensions
+        are retained and the output shape is (batch_size, num_channels,
+        1).
     """
-    def __init__(self, axis=-1, **kwargs):
+    def __init__(self, axis=-1, keep_dims=False, **kwargs):
         super().__init__(**kwargs)
         self.axis = axis
+        self.keep_dims = keep_dims
 
     def __str__(self):
         return 'GlobalAveragePooling1D'
@@ -45,7 +52,7 @@ class GlobalAveragePooling1D(BasePooling):
             Average-pooled output tensor.
         """
         self.input = inputs
-        self.output = np.mean(inputs, axis=self.axis)
+        self.output = np.mean(inputs, axis=self.axis, keepdims=self.keep_dims)
         return self.output
 
     def backward(self, grads):

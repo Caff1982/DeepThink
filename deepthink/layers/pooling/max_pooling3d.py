@@ -75,8 +75,6 @@ class MaxPooling3D(BasePooling):
         # Create a mask of the max values
         self.max_args = np.where(view == self.output, 1, 0)
         self.output = np.squeeze(self.output, axis=(5, 6, 7))
-        print('output: ', self.output.shape)
-        print('output_shape: ', self.output.shape)
         self.output = np.transpose(self.output, (0, 4, 1, 2, 3))
         return self.output
 
