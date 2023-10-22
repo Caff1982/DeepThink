@@ -19,20 +19,20 @@ class BaseLayer:
 
     Parameters
     ----------
-    prev_layer : (any subclass of BaseLayer)
+    prev_layer : (any subclass of BaseLayer), default=None
         The previous layer in the neural network. Added automatically
         during initialization.
-    next_layer : (any subclass of BaseLayer)
+    next_layer : (any subclass of BaseLayer), default=None
         The next layer in the neural network. Added automatically
         during initialization.
-    input_shape : tuple
+    input_shape : tuple, default=None
         The shape of the input array. This is a required argument
         for the first layer, otherwise computed during
         initialization. Should have shape (N, D) or (N, D, H, W).
-    weight_init : str
+    weight_init : str, default='he_uniform'
         The type of initialization to use when creating the layer
         weights. See initialize_weights in utils for more info.
-    dtype : type
+    dtype : type, default=np.float32
         The numpy datatype to be used. Uses np.float32 by default,
         np.float64 is required for gradient checking.
     """
