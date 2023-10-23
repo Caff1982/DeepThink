@@ -65,7 +65,7 @@ def initialize_weights(shape, init_type, dtype=np.float32):
         raise Exception(f'Weight init type "{init_type}" not recognized')
 
 
-def get_strided_view_1D(arr, view_shape, stride):
+def get_strided_view_1D(arr, view_shape, stride, writeable=False):
     """
     Return a view of an array using Numpy's as_strided
     slide-trick.
@@ -83,6 +83,8 @@ def get_strided_view_1D(arr, view_shape, stride):
         The shape of the view to be returned.
     stride : int
         The step size between each view.
+    writeable : bool,default=False
+        Whether the returned view is writeable or not.
 
     Returns
     -------
@@ -94,10 +96,10 @@ def get_strided_view_1D(arr, view_shape, stride):
     strides = (s0, stride * s2, s1, s2)
     # Return a view of the array with the given shape and strides
     return np.lib.stride_tricks.as_strided(
-        arr, view_shape, strides=strides, writeable=True)
+        arr, view_shape, strides=strides, writeable=writeable)
 
 
-def get_strided_view_2D(arr, view_shape, stride):
+def get_strided_view_2D(arr, view_shape, stride, writeable=False):
     """
     Return a view of an array using Numpy's as_strided
     slide-trick.
@@ -116,6 +118,8 @@ def get_strided_view_2D(arr, view_shape, stride):
         The shape of the view to be returned.
     stride : int
         The step size between each view.
+    writeable : bool,default=False
+        Whether the returned view is writeable or not.
 
     Returns
     -------
@@ -127,10 +131,10 @@ def get_strided_view_2D(arr, view_shape, stride):
     strides = (s0, stride * s2, stride * s3, s1, s2, s3)
     # Return a view of the array with the given shape and strides
     return np.lib.stride_tricks.as_strided(
-        arr, view_shape, strides=strides, writeable=True)
+        arr, view_shape, strides=strides, writeable=writeable)
 
 
-def get_strided_view_3D(arr, view_shape, stride):
+def get_strided_view_3D(arr, view_shape, stride, writeable=False):
     """
     Return a view of an array using Numpy's as_strided
     slide-trick.
@@ -150,6 +154,8 @@ def get_strided_view_3D(arr, view_shape, stride):
         The shape of the view to be returned.
     stride : int
         The step size between each view.
+    writeable : bool,default=False
+        Whether the returned view is writeable or not.
 
     Returns
     -------
@@ -161,7 +167,7 @@ def get_strided_view_3D(arr, view_shape, stride):
     strides = (s0, stride * s2, stride * s3, stride * s4, s1, s2, s3, s4)
     # Return a view of the array with the given shape and strides
     return np.lib.stride_tricks.as_strided(
-        arr, view_shape, strides=strides, writeable=True)
+        arr, view_shape, strides=strides, writeable=writeable)
 
 
 def pad_1D(arr, padding, mode='constant'):
