@@ -38,6 +38,7 @@ class Dense(BaseLayer):
         elif self.prev_layer is None and self.input_shape is None:
             raise ValueError(
                 'input_shape is a required argument for the first layer.')
+
         # Initialize output array, shape: (batch-size, n_neurons)
         self.output = np.zeros((self.input_shape[0], self.n_neurons),
                                dtype=self.dtype)
@@ -60,13 +61,13 @@ class Dense(BaseLayer):
         self.bias_grad_cache = np.zeros(self.bias.shape,
                                         dtype=self.dtype)
 
-    def forward(self, X):
+    def forward(self, inputs):
         """
-        Perform one forward pass on inputs X.
+        Perform one forward pass on inputs.
         """
         # Store input to be used in backpropagation
-        self.input = X
-        self.output = np.dot(X, self.weights) + self.bias
+        self.input = inputs
+        self.output = np.dot(inputs, self.weights) + self.bias
         return self.output
 
     def backward(self, grads):

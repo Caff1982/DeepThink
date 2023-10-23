@@ -6,9 +6,11 @@ from deepthink.layers.layer import BaseLayer
 
 class Flatten(BaseLayer):
     """
-    Flattens the input array, batch-size is the only dimension
-    preserved. Used to reshape output from conv/pooling layers to
-    be used as input for a Dense layer.
+    Flattens the input array.
+
+    Batch-size is the only dimension preserved. Used to
+    reshape output from convolution/pooling layers to be
+    used as input for a Dense layer.
     """
     def __init__(self, input_shape=None, **kwargs):
         super().__init__(**kwargs)
@@ -31,11 +33,11 @@ class Flatten(BaseLayer):
             self.input_shape,
             dtype=self.dtype).reshape((self.input_shape[0], -1))
 
-    def forward(self, X):
+    def forward(self, inputs):
         """
-        Perform one forward pass by flattening input array
+        Perform one forward pass by flattening input array.
         """
-        self.output = X.ravel().reshape(self.output.shape)
+        self.output = inputs.ravel().reshape(self.output.shape)
         return self.output
 
     def backward(self, grads):
