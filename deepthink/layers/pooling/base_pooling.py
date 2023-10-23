@@ -1,17 +1,14 @@
-import numpy as np
-
 from deepthink.layers.layer import BaseLayer
 
 
 class BasePooling(BaseLayer):
     """Base class for pooling layers."""
 
-    def __init__(self, pool_size=2, stride=2, padding=0,
+    def __init__(self, pool_size=2, stride=2,
                  input_shape=None, **kwargs):
         super().__init__(**kwargs)
         self.pool_size = pool_size
         self.stride = stride
-        self.padding = padding
         self.input_shape = input_shape
 
     @property

@@ -164,6 +164,55 @@ def get_strided_view_3D(arr, view_shape, stride):
         arr, view_shape, strides=strides, writeable=True)
 
 
+def pad_1D(arr, padding, mode='constant'):
+    """
+    Return array with padding added to sequence dimension.
+
+    Parameters
+    ----------
+    arr : np.array
+        The array to perform the operation on.
+    padding : tuple
+        The amount of padding to add to the sequence dimension.
+
+    Returns
+    -------
+    padded : np.array
+        The array with padding added to sequence dimension.
+    """
+    return np.pad(
+        arr,
+        pad_width=((0, 0), (0, 0),
+                   padding),
+        mode=mode
+    )
+
+
+def pad_2D(arr, padding, mode='constant'):
+    """
+    Return array with padding added to height & width dimensions.
+
+    Parameters
+    ----------
+    arr : np.array
+        The array to perform the operation on.
+    padding : tuple
+        The amount of padding to add to the height & width dimensions.
+
+    Returns
+    -------
+    padded : np.array
+        The array with padding added to height & width dimensions.
+    """
+    return np.pad(
+        arr,
+        pad_width=((0, 0), (0, 0),
+                   padding,
+                   padding),
+        mode=mode
+    )
+
+
 def one_hot_encode(arr,  k, dtype=np.float32):
     """
     Takes 1D array of target integer values and return a
@@ -252,8 +301,6 @@ def load_mnist_data(filepath=None, test_split=60000,
         A tuple of (X_test, y_test), both numpy arrays, for test X-data
         and labels.
     """
-    import pandas as pd
-    
     if filepath:
         # Download dataset if file does not already exist
         if not os.path.exists(filepath):
