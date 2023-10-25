@@ -61,12 +61,12 @@ class GlobalAveragePooling1D(BasePooling):
 
         Parameters
         ----------
-        grads : array-like, shape (batch_size, features)
+        grads : np.array, shape (batch_size, features)
             Gradients from the subsequent layer.
 
         Returns
         -------
-        dinputs : array-like, shape (batch_size, features, seq_len)
+        dinputs : np.array, shape (batch_size, features, seq_len)
             Gradients for the inputs.
         """
         seq_len = self.input_shape[-1]

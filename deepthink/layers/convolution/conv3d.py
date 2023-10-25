@@ -1,23 +1,23 @@
 import numpy as np
 
 from deepthink.layers.convolution.base_convolution import BaseConv
-from deepthink.utils import initialize_weights, get_strided_view_2D, pad_2D
+from deepthink.utils import initialize_weights, get_strided_view_3D, pad_3D
 
 
-class Conv2D(BaseConv):
+class Conv3D(BaseConv):
     """
-    2D convolution layer.
+    3D convolution layer.
 
     This layer convolves (or cross-correlates) a kernel with the input
     image to create a tensor of output feature maps.
 
-    Input shape should be (batch_size, n_channels, img_size, img_size)
-    and is required for the first layer.
+    Input shape is required for the first layer and should be:
+    (batch_size, n_channels, img_size, img_size, img_size)
 
     Parameters
     ----------
     kernel_size : int
-        The width/height of the 2D convolution window.
+        The width/height of the 3D convolution window.
         Currently only supports square kernels
     n_filters : int
         The dimensionality of the output space.
@@ -53,7 +53,7 @@ class Conv2D(BaseConv):
         )
 
     def __str__(self):
-        return 'Conv2D'
+        return 'Conv3D'
 
     def initialize(self):
         """
@@ -68,16 +68,20 @@ class Conv2D(BaseConv):
         # Create output array to store forward pass results
         self.output = np.zeros(
             (self.batch_size, self.n_filters,
-             self.output_size, self.output_size)).astype(self.dtype)
+             self.output_size, self.output_size,
+             self.output_size)).astype(self.dtype)
         # Create the shapes to use with "get_strided_view"
         self.forward_view_shape = (self.batch_size, self.output_size,
-                                   self.output_size, self.n_channels,
+                                   self.output_size, self.output_size,
+                                   self.n_channels, self.kernel_size,
                                    self.kernel_size, self.kernel_size)
         self.dilate_pad_shape = (self.batch_size, self.n_filters,
                                  self.output_size * self.stride,
+                                 self.output_size * self.stride,
                                  self.output_size * self.stride)
         self.backward_view_shape = (self.batch_size, self.spatial_size,
-                                    self.spatial_size, self.n_filters,
+                                    self.spatial_size, self.spatial_size,
+                                    self.n_filters, self.kernel_size,
                                     self.kernel_size, self.kernel_size)
         # Dilate padding is used to pad the gradients before matrix-multiply
         self.dilate_padding = (self.kernel_size - self.padding_amount - 1,
@@ -85,7 +89,8 @@ class Conv2D(BaseConv):
 
         # Initialize weights and bias
         kernel_shape = (self.n_filters, self.n_channels,
-                        self.kernel_size, self.kernel_size)
+                        self.kernel_size, self.kernel_size,
+                        self.kernel_size)
         self.weights = initialize_weights(kernel_shape, self.weight_init,
                                           dtype=self.dtype)
         self.bias = np.zeros((self.n_filters, 1), dtype=self.dtype)
@@ -110,7 +115,7 @@ class Conv2D(BaseConv):
         multiplication is performed for each forward pass, improving
         computational efficiency.
 
-        Input shape should be (batch, n_channels, height, width).
+        Input shape should be (batch, n_channels, depth, height, width).
 
         Parameters
         ----------
@@ -127,13 +132,13 @@ class Conv2D(BaseConv):
         -https://cs231n.github.io/convolutional-networks/#conv
         """
         if self.padding:
-            inputs = pad_2D(inputs, self.padding)
+            inputs = pad_3D(inputs, self.padding)
 
-        self.view = get_strided_view_2D(inputs,
+        self.view = get_strided_view_3D(inputs,
                                         self.forward_view_shape,
                                         self.stride)
         # Reshape view to column vector
-        X_col_dims = np.multiply.reduceat(self.view.shape, (0, 3))
+        X_col_dims = np.multiply.reduceat(self.view.shape, (0, 4))
         X_col = self.view.reshape(X_col_dims)
         # Reshape weights to column vector
         W_col = self.weights.reshape(self.n_filters, -1)
@@ -143,8 +148,9 @@ class Conv2D(BaseConv):
         self.output = out.reshape(self.n_filters,
                                   self.batch_size,
                                   self.output_size,
+                                  self.output_size,
                                   self.output_size)
-        self.output = self.output.transpose(1, 0, 2, 3)
+        self.output = self.output.transpose(1, 0, 2, 3, 4)
         return self.output
 
     def backward(self, grads):
@@ -155,24 +161,24 @@ class Conv2D(BaseConv):
         and inputs.
         """
         # Get gradient w.r.t. bias
-        dB = np.sum(grads, axis=(0, 2, 3))
+        dB = np.sum(grads, axis=(0, 2, 3, 4))
         # Get gradient w.r.t weights
-        dW = np.tensordot(self.view, grads, axes=([0, 1, 2],
-                                                  [0, 2, 3]))
-        dW = dW.transpose(3, 0, 1, 2)
+        dW = np.tensordot(self.view, grads, axes=([0, 1, 2, 3],
+                                                  [0, 2, 3, 4]))
+        dW = dW.transpose(4, 0, 1, 2, 3)
         # Get gradients w.r.t inputs
         # Pad gradients to correct dims before matrix-multiply
         padded_grads = np.zeros(self.dilate_pad_shape)
-        padded_grads[:, :, ::self.stride, ::self.stride] = grads
-        padded_grads = pad_2D(padded_grads, self.dilate_padding)
+        padded_grads[:, :, ::self.stride, ::self.stride, ::self.stride] = grads
+        padded_grads = pad_3D(padded_grads, self.dilate_padding)
         # Rotate/transpose weights
-        rot_weights = np.rot90(self.weights, 2, axes=(2, 3))
-        grads_view = get_strided_view_2D(padded_grads,
+        rot_weights = np.rot90(self.weights, 3, axes=(3, 4))
+        grads_view = get_strided_view_3D(padded_grads,
                                          self.backward_view_shape,
                                          1)
-        dX = np.tensordot(grads_view, rot_weights, axes=([3, 4, 5],
-                                                         [0, 2, 3]))
+        dX = np.tensordot(grads_view, rot_weights, axes=([4, 5, 6, 7],
+                                                         [0, 2, 3, 4]))
         self.dweights = dW
         # Reshape bias to column vector
         self.dbiases = dB.reshape(-1, 1)
-        self.dinputs = dX.transpose(0, 3, 1, 2)
+        self.dinputs = dX.transpose(0, 4, 1, 2, 3)

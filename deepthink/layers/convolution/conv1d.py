@@ -108,7 +108,7 @@ class Conv1D(BaseConv):
         multiplication is performed for each forward pass, improving
         computational efficiency.
 
-        Input shape should be (batch, depth-out, sequence).
+        Input shape should be (batch, sequence-length).
 
         Parameters
         ----------
