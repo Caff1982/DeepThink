@@ -28,7 +28,7 @@ class BaseGlobalPooling(BaseLayer):
         """
         if self.keep_dims:
             shape = (self.input_shape[0], self.input_shape[1]) \
-                     + (1,) * (len(self.axes) - 2)
+                     + (1,) * (len(self.input_shape) - 2)
         else:
             shape = (self.input_shape[0], self.input_shape[1])
 
