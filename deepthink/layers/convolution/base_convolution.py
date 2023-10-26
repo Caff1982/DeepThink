@@ -67,28 +67,6 @@ class BaseConv(BaseLayer):
         self.weight_grad_cache = None
         self.bias_grad_cache = None
 
-    @property
-    def input_shape(self):
-        """
-        Set the input shape of the layer.
-
-        Uses 'property' decorator to allow the input shape to be inferred
-        from the previous layer if it is not set explicitly. This is
-        necessary for the first layer in the network. If the input shape
-        is not set and there is no previous layer, an error is raised.
-        """
-        if self._input_shape is None:
-            if self.prev_layer is None:
-                raise ValueError(
-                    'Input shape must be set for first layer in the network.'
-                )
-            return self.prev_layer.output.shape
-        return self._input_shape
-
-    @input_shape.setter
-    def input_shape(self, shape):
-        self._input_shape = shape
-
     def _set_padding_and_output_size(self):
         """
         This method sets the padding and output size attributes based on

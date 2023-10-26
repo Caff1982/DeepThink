@@ -36,16 +36,12 @@ class MaxPooling3D(BasePooling):
         """
         Initialize settings to prepare the layer for training
         """
-        batches, channels, img_size, img_size, img_size = self.input_shape
-        self.batch_size = batches
-        self.n_channels = channels
-        self.img_size = img_size
-        # Output size equation is [(W−K+2P)/S]+1
-        self.output_size = ((img_size - self.pool_size) // self.stride) + 1
+        # Get input shape and calculate output shape
+        self.set_output_size()
 
-        self.output = np.zeros((batches, channels, self.output_size,
-                                self.output_size, self.output_size),
-                               dtype=self.dtype)
+        self.output = np.zeros((self.batch_size, self.n_channels,
+                                self.output_size, self.output_size,
+                                self.output_size), dtype=self.dtype)
         # Adjust the forward view shape
         self.forward_view_shape = (self.batch_size, self.output_size,
                                    self.output_size, self.output_size,

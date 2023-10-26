@@ -1,9 +1,9 @@
 import numpy as np
 
-from deepthink.layers.pooling.base_pooling import BasePooling
+from deepthink.layers.pooling.base_global_pooling import BaseGlobalPooling
 
 
-class GlobalAveragePooling2D(BasePooling):
+class GlobalAveragePooling2D(BaseGlobalPooling):
     """
     Global Average Pooling 2D layer.
 
@@ -23,37 +23,14 @@ class GlobalAveragePooling2D(BasePooling):
         1, 1).
     """
     def __init__(self, axes=(-2, -1), keep_dims=False, **kwargs):
-        super().__init__(**kwargs)
-        self.axes = axes
-        self.keep_dims = keep_dims
+        super().__init__(
+            axes=axes,
+            keep_dims=keep_dims,
+            **kwargs
+        )
 
     def __str__(self):
         return 'GlobalAveragePooling2D'
-
-    def initialize(self):
-        """
-        Initialize the global average pooling 2D layer.
-        """
-        # The output shape will be (batch_size, num_channels)
-        self.output = np.zeros((self.input_shape[0], self.input_shape[1]))
-
-    def forward(self, inputs):
-        """
-        Perform the forward pass on input tensor.
-
-        Parameters
-        ----------
-        inputs : np.array, shape (batch_size, features, height, width)
-            Input tensor.
-
-        Returns
-        -------
-        output : np.array, shape (batch_size, features)
-            Average-pooled output tensor.
-        """
-        self.input = inputs
-        self.output = np.mean(inputs, axis=self.axes, keepdims=self.keep_dims)
-        return self.output
 
     def backward(self, grads):
         """
@@ -69,10 +46,16 @@ class GlobalAveragePooling2D(BasePooling):
         dinputs : np.array, shape (batch_size, features, height, width)
             Gradients for the inputs.
         """
-        height, width = self.input_shape[-2], self.input_shape[-1]
-        # Reshape the gradients to shape (batch_size, num_channels, 1, 1)
+        # Reshape the gradients to (batch_size, num_channels, 1, 1)
         # and divide by the number of elements in the feature map
-        self.dinputs = grads[:, :, np.newaxis, np.newaxis] / (height * width)
+        self.dinputs = grads[:, :,
+                             np.newaxis,
+                             np.newaxis] / self.scaling_factor
         # Broadcast the gradients to the input shape using np.tile
-        self.dinputs = np.tile(self.dinputs, (1, 1, height, width))
+        self.dinputs = np.tile(
+            self.dinputs,
+            (1, 1,
+             self.spatial_size,
+             self.spatial_size)
+        )
         return self.dinputs

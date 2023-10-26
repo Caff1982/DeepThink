@@ -36,17 +36,10 @@ class MaxPooling2D(BasePooling):
         """
         Initialize settings to prepare the layer for training
         """
-        batches, channels, img_size, img_size = self.input_shape
-        self.batch_size = batches
-        self.n_channels = channels
-        self.img_size = img_size
-        # Output size equation is [(W−K+2P)/S]+1
-        self.output_size = ((img_size - self.pool_size) / self.stride) + 1
-        if int(self.output_size) != self.output_size:
-            raise ValueError('Invalid dims. Output-size must be integer')
+        # Get input shape and calculate output shape
+        self.set_output_size()
 
-        self.output_size = int(self.output_size)
-        self.output = np.zeros((batches, channels,
+        self.output = np.zeros((self.batch_size, self.n_channels,
                                self.output_size, self.output_size),
                                dtype=self.dtype)
         # Create the shapes to use with "get_strided_view"

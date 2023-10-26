@@ -45,6 +45,34 @@ class BaseLayer:
         self.weight_init = weight_init
         self.dtype = dtype
 
+        # Create placehoders to be defined in initialize method
+        self.input = None
+        self.output = None
+        self.dweights = None
+        self.dbias = None
+        self.dinputs = None
+        self.weights = None
+        self.bias = None
+        self.weight_momentum = None
+        self.bias_momentum = None
+        self.weight_grad_cache = None
+        self.bias_grad_cache = None
+
+    @property
+    def input_shape(self):
+        # If the _input_shape is not set, infer it from the previous layer
+        if self._input_shape is None:
+            if self.prev_layer is None:
+                raise ValueError(
+                    'input_shape is a required argument for the first layer.'
+                )
+            return self.prev_layer.output.shape
+        return self._input_shape
+
+    @input_shape.setter
+    def input_shape(self, shape):
+        self._input_shape = shape
+
     def initialize(self):
         raise NotImplementedError(
             'All BaseLayer subclasses must implement initialize method'
