@@ -48,11 +48,6 @@ class BaseLayer:
         # Create placehoders to be defined in initialize method
         self.input = None
         self.output = None
-        self.dweights = None
-        self.dbias = None
-        self.dinputs = None
-        self.weights = None
-        self.bias = None
         self.weight_momentum = None
         self.bias_momentum = None
         self.weight_grad_cache = None
