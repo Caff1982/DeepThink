@@ -219,6 +219,33 @@ def pad_2D(arr, padding, mode='constant'):
     )
 
 
+def pad_3D(arr, padding, mode='constant'):
+    """
+    Return array with padding added to height,
+    width & depth dimensions.
+
+    Parameters
+    ----------
+    arr : np.array
+        The array to perform the operation on.
+    padding : tuple
+        The amount of padding to add to the spatial dimensions.
+
+    Returns
+    -------
+    padded : np.array
+        The array with padding added to spatial dimensions.
+    """
+    return np.pad(
+        arr,
+        pad_width=((0, 0), (0, 0),
+                   padding,
+                   padding,
+                   padding),
+        mode=mode
+    )
+
+
 def one_hot_encode(arr,  k, dtype=np.float32):
     """
     Takes 1D array of target integer values and return a
