@@ -2,7 +2,7 @@ from deepthink.layers.layer import BaseLayer
 
 
 class BasePooling(BaseLayer):
-    """Base class for max pooling layers."""
+    """Base class for max/mean pooling layers."""
 
     def __init__(
         self,
