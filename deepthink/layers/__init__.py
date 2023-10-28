@@ -7,6 +7,9 @@ from deepthink.layers.convolution.conv3d import Conv3D
 from deepthink.layers.pooling.max_pooling1d import MaxPooling1D
 from deepthink.layers.pooling.max_pooling2d import MaxPooling2D
 from deepthink.layers.pooling.max_pooling3d import MaxPooling3D
+from deepthink.layers.pooling.average_pooling1d import AveragePooling1D
+from deepthink.layers.pooling.average_pooling2d import AveragePooling2D
+from deepthink.layers.pooling.average_pooling3d import AveragePooling3D
 from deepthink.layers.pooling.global_average_pooling1d import GlobalAveragePooling1D
 from deepthink.layers.pooling.global_average_pooling2d import GlobalAveragePooling2D
 from deepthink.layers.pooling.global_average_pooling3d import GlobalAveragePooling3D
