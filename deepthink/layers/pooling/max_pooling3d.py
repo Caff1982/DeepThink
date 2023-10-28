@@ -29,9 +29,6 @@ class MaxPooling3D(BasePooling):
             **kwargs
         )
 
-    def __repr__(self):
-        return 'MaxPooling3D'
-
     def initialize(self):
         """
         Initialize settings to prepare the layer for training

@@ -28,9 +28,6 @@ class GlobalAveragePooling1D(BaseGlobalPooling):
             keep_dims=keep_dims,
             **kwargs)
 
-    def __str__(self):
-        return 'GlobalAveragePooling1D'
-
     def backward(self, grads):
         """
         Perform backpropagation by computing the gradients.

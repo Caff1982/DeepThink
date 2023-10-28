@@ -38,9 +38,6 @@ class AveragePooling1D(BasePooling):
         # Calculate scaling factor for mean pooling backprop
         self.scaling_factor = self.pool_size
 
-    def __repr__(self):
-        return 'AveragePooling1D'
-
     def initialize(self):
         """
         Initialize settings to prepare the layer for training.

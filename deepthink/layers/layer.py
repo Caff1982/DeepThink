@@ -68,6 +68,9 @@ class BaseLayer:
     def input_shape(self, shape):
         self._input_shape = shape
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}'
+
     def initialize(self):
         raise NotImplementedError(
             'All BaseLayer subclasses must implement initialize method'

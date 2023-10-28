@@ -52,9 +52,6 @@ class Conv3D(BaseConv):
             **kwargs
         )
 
-    def __str__(self):
-        return 'Conv3D'
-
     def initialize(self):
         """
         Initialize settings to prepare the layer for training.

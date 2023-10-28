@@ -34,9 +34,6 @@ class Embedding(BaseLayer):
         self.seq_len = input_shape[-1]
         self.weight_init = weight_init
 
-    def __str__(self):
-        return 'Embedding Layer'
-
     def initialize(self):
         """
         Initialize the embedding layer.

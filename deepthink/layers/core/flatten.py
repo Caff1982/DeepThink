@@ -16,9 +16,6 @@ class Flatten(BaseLayer):
         super().__init__(**kwargs)
         self.input_shape = input_shape
 
-    def __repr__(self):
-        return 'Flatten'
-
     def initialize(self):
         """
         Initialize settings to prepare the layer for training

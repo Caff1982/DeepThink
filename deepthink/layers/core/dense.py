@@ -25,7 +25,7 @@ class Dense(BaseLayer):
         self.n_neurons = n_neurons
         self.input_shape = input_shape
 
-    def __str__(self):
+    def __repr__(self):
         return f'Dense({self.n_neurons})'
 
     def initialize(self):

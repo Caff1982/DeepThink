@@ -29,9 +29,6 @@ class GlobalAveragePooling2D(BaseGlobalPooling):
             **kwargs
         )
 
-    def __str__(self):
-        return 'GlobalAveragePooling2D'
-
     def backward(self, grads):
         """
         Perform backpropagation by computing the gradients.
