@@ -20,7 +20,10 @@ class Sigmoid:
     - https://beckernick.github.io/sigmoid-derivative-neural-network/
     """
     def __repr__(self):
-        return 'Sigmoid Activation'
+        return 'Sigmoid'
+
+    def __call__(self, x):
+        return self.forward(x)
 
     def forward(self, x):
         """
@@ -56,7 +59,10 @@ class ReLU:
     - https://arxiv.org/abs/1803.08375 (ReLU paper)
     """
     def __repr__(self):
-        return 'ReLU Activation'
+        return 'ReLU'
+
+    def __call__(self, x):
+        return self.forward(x)
 
     def forward(self, x):
         """
@@ -103,7 +109,10 @@ class LeakyReLU:
         self.alpha = alpha
 
     def __repr__(self):
-        return 'Leaky-ReLU Activation'
+        return 'Leaky-ReLU'
+
+    def __call__(self, x):
+        return self.forward(x)
 
     def forward(self, x):
         """
@@ -145,7 +154,10 @@ class ELU:
         self.alpha = alpha
 
     def __repr__(self):
-        return 'ELU Activation'
+        return 'ELU'
+
+    def __call__(self, x):
+        return self.forward(x)
 
     def forward(self, x):
         """
@@ -182,16 +194,19 @@ class TanH:
     - https://mathworld.wolfram.com/HyperbolicTangent.html
     """
     def __repr__(self):
-        return 'TanH Activation'
+        return 'TanH'
 
-    def forward(self, inputs):
+    def __call__(self, x):
+        return self.forward(x)
+
+    def forward(self, x):
         """
         Return the input array with tanh activation applied.
 
         The output is also stored as an instance attributes
         to be used in backpropagation.
         """
-        self.output = np.tanh(inputs)
+        self.output = np.tanh(x)
         return self.output
 
     def backward(self, grads):
@@ -225,7 +240,10 @@ class Softmax:
     -https://en.wikipedia.org/wiki/Softmax_function
     """
     def __repr__(self):
-        return 'Softmax Activation'
+        return 'Softmax'
+
+    def __call__(self, x):
+        return self.forward(x)
 
     def forward(self, x):
         """
