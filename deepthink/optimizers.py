@@ -7,6 +7,8 @@ class BaseOptimizer:
 
     Parameters
     ----------
+    learning_rate : float
+        The learning rate determines the step size at each update.
     lr_decay : float,default=None
         Learning rate decay, the amount to decay the learning rate by
         each epoch. Uses exponential decay:
@@ -24,8 +26,10 @@ class BaseOptimizer:
         The layers in the network in sequential order.
         This is added during initialization.
     """
-    def __init__(self, lr_decay=None, init_lr=None,
+
+    def __init__(self, learning_rate, lr_decay=None, init_lr=None,
                  min_lr=0.0, iteration=0, layers=None):
+        self.learning_rate = learning_rate
         self.lr_decay = lr_decay
         self.init_lr = init_lr
         self.min_lr = min_lr
@@ -33,9 +37,7 @@ class BaseOptimizer:
         self.layers = layers
 
     def __repr__(self):
-        raise NotImplementedError(
-            'All Optimzier subclasses must implement __repr__ method'
-        )
+        return f'{self.__class__.__name__} Optimizer'
 
     def initialize(self, layers):
         """
@@ -85,13 +87,13 @@ class SGD(BaseOptimizer):
         updates at each update stage, like a moving average effect.
         Should be in range 0-1 with zero being no momentum added.
     """
-    def __init__(self, learning_rate, momentum=None, **kwargs):
-        super().__init__(**kwargs)
-        self.learning_rate = learning_rate
-        self.momentum = momentum
 
-    def __repr__(self):
-        return 'SGD Optimizer'
+    def __init__(self, learning_rate, momentum=None, **kwargs):
+        super().__init__(
+            learning_rate=learning_rate,
+            **kwargs
+        )
+        self.momentum = momentum
 
     def update(self):
         """
@@ -146,13 +148,13 @@ class NAG(BaseOptimizer):
     ----------
     - https://cs231n.github.io/neural-networks-3/#sgd
     """
-    def __init__(self, learning_rate, momentum=0.9, **kwargs):
-        super().__init__(**kwargs)
-        self.learning_rate = learning_rate
-        self.momentum = momentum
 
-    def __repr__(self):
-        return 'Nesterov Optimizer'
+    def __init__(self, learning_rate, momentum=0.9, **kwargs):
+        super().__init__(
+            learning_rate=learning_rate,
+            **kwargs
+        )
+        self.momentum = momentum
 
     def update(self):
         """
@@ -202,12 +204,11 @@ class AdaGrad(BaseOptimizer):
         A constant used to prevent division by zero errors.
     """
     def __init__(self, learning_rate, epsilon=1e-7, **kwargs):
-        super().__init__(**kwargs)
-        self.learning_rate = learning_rate
+        super().__init__(
+            learning_rate=learning_rate,
+            **kwargs
+        )
         self.epsilon = epsilon
-
-    def __repr__(self):
-        return 'AdaGrad Optimizer'
 
     def update(self):
         """
@@ -260,13 +261,12 @@ class RMSProp(BaseOptimizer):
         A constant used to prevent division by zero errors.
     """
     def __init__(self, learning_rate, rho=0.9, epsilon=1e-7, **kwargs):
-        super().__init__(**kwargs)
-        self.learning_rate = learning_rate
+        super().__init__(
+            learning_rate=learning_rate,
+            **kwargs
+        )
         self.rho = rho
         self.epsilon = epsilon
-
-    def __repr__(self):
-        return 'RMSProp Optimizer'
 
     def update(self):
         """
@@ -324,14 +324,13 @@ class Adam(BaseOptimizer):
     """
     def __init__(self, learning_rate, beta1=0.9, beta2=0.999,
                  epsilon=1e-7, **kwargs):
-        super().__init__(**kwargs)
-        self.learning_rate = learning_rate
+        super().__init__(
+            learning_rate=learning_rate,
+            **kwargs
+        )
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
-
-    def __repr__(self):
-        return 'Adam Optimizer'
 
     def update(self):
         """
