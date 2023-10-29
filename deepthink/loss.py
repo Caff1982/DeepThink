@@ -16,6 +16,9 @@ class BaseLoss:
     arrays are not the same length then both will be resized to match.
     """
 
+    def __repr__(self):
+        return f'{self.__class__.__name__}'
+
     def __call__(self, y_true, y_hat):
         # If arrays are not the same length then resize
         if y_true.shape != y_hat.shape:
@@ -50,9 +53,6 @@ class CategoricalCrossEntropy(BaseLoss):
     ----------
     - https://en.wikipedia.org/wiki/Cross_entropy
     """
-
-    def __str__(self):
-        return 'CategoricalCrossentropy'
 
     def loss(self, y_true, y_hat, epsilon=1e-7):
         """
@@ -107,9 +107,6 @@ class BinaryCrossEntropy(BaseLoss):
     It is often used with sigmoid activation functions in binary
     classification tasks.
     """
-
-    def __str__(self):
-        return 'BinaryCrossentropy'
 
     def loss(self, y_true, y_hat, epsilon=1e-7):
         """
@@ -170,9 +167,6 @@ class MeanSquaredError(BaseLoss):
 
     """
 
-    def __str__(self):
-        return 'MeanSquaredError'
-
     def loss(self, y_true, y_hat):
         """
         Return the Mean Squared Error (MSE) loss between labels and
@@ -193,7 +187,7 @@ class MeanSquaredError(BaseLoss):
         # Store labels and predictions for use in backprop
         self.y_true = y_true
         self.y_hat = y_hat
-        self.output = np.square(y_true - y_hat).mean() 
+        self.output = np.square(y_true - y_hat).mean()
         return self.output
 
     def grads(self):
