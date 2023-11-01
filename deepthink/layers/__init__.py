@@ -4,6 +4,9 @@ from deepthink.layers.core.flatten import Flatten
 from deepthink.layers.convolution.conv1d import Conv1D
 from deepthink.layers.convolution.conv2d import Conv2D
 from deepthink.layers.convolution.conv3d import Conv3D
+from deepthink.layers.convolution.upsample1d import Upsample1D
+from deepthink.layers.convolution.upsample2d import Upsample2D
+from deepthink.layers.convolution.upsample3d import Upsample3D
 from deepthink.layers.pooling.max_pooling1d import MaxPooling1D
 from deepthink.layers.pooling.max_pooling2d import MaxPooling2D
 from deepthink.layers.pooling.max_pooling3d import MaxPooling3D

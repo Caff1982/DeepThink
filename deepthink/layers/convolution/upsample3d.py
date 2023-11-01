@@ -3,9 +3,9 @@ import numpy as np
 from deepthink.layers.layer import BaseLayer
 
 
-class Upsample2D(BaseLayer):
+class Upsample3D(BaseLayer):
     """
-    Upsample layer for 2D inputs.
+    Upsample layer for 3D inputs.
 
     Images are resized using nearest neighbor interpolation.
 
@@ -26,6 +26,7 @@ class Upsample2D(BaseLayer):
         self.output = np.zeros((
             self.input_shape[0],
             self.input_shape[1],
+            upsample_size,
             upsample_size,
             upsample_size),
             dtype=self.dtype)
@@ -48,11 +49,14 @@ class Upsample2D(BaseLayer):
         """
         self.output = np.repeat(
             np.repeat(
-                inputs,
+                np.repeat(
+                    inputs,
+                    self.scale_factor,
+                    axis=2),
                 self.scale_factor,
-                axis=2),
+                axis=3),
             self.scale_factor,
-            axis=3
+            axis=4
         )
         return self.output
 
@@ -74,5 +78,8 @@ class Upsample2D(BaseLayer):
             Gradients of the inputs.
         """
         self.dinputs = np.zeros(self.input_shape, dtype=self.dtype)
-        self.dinputs = grads[:, :, ::self.scale_factor, ::self.scale_factor]
+        self.dinputs = grads[:, :,
+                             ::self.scale_factor,
+                             ::self.scale_factor,
+                             ::self.scale_factor]
         return self.dinputs
