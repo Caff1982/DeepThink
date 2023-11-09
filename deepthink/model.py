@@ -226,7 +226,7 @@ class Model:
             # initialize model_outputs to store model predictions and
             # is used to evaluate performance at epoch end.
             model_outputs = np.zeros((num_batches * self.batch_size,
-                                     y_train.shape[1]), dtype=self.dtype)
+                                     *y_train.shape[1:]), dtype=self.dtype)
             # Iterate over each mini-batch
             for batch_idx in tqdm(range(num_batches), disable=not verbose):
                 start = batch_idx * self.batch_size
@@ -293,7 +293,7 @@ class Model:
             len_preds = self.batch_size
 
         # Create the array to store predictions
-        predictions = np.zeros((len_preds, self._layers[-1].output.shape[1]))
+        predictions = np.zeros((len_preds, *self._layers[-1].output.shape[1:]))
         # batch_id is used as current batch index
         batch_id = 0
         while batch_id < len_preds:
