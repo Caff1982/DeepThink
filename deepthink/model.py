@@ -244,19 +244,11 @@ class Model:
                 # Optimizer update
                 self.optimizer.update()
 
-            # Evaluate performance
-            if epoch == 0:
-                # On first epoch get new predictions to avoid
-                # reporting large error during first few batches
-                train_preds = self.get_predictions(X_train_shuffled)
-            else:
-                train_preds = model_outputs
-
             train_labels = y_train_shuffled[:model_outputs.shape[0]]
             val_preds = self.get_predictions(X_val)
             val_labels = y_val[:val_preds.shape[0]]
             # Update history
-            self.history.on_epoch_end(train_labels, train_preds,
+            self.history.on_epoch_end(train_labels, model_outputs,
                                       val_labels, val_preds)
         return self.history
 
