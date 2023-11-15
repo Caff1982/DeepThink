@@ -81,7 +81,6 @@ class BaseConv(BaseLayer):
             self.padding_amount = ((self.spatial_size - self.output_size)
                                    + (self.kernel_size - 1) + 1) // 2
             self.padding = (self.padding_amount, self.padding_amount)
-
         elif self.padding_type == 'valid':
             # Output size equation for is: [(spatial_size−K+2P)/S]+1
             self.output_size = ((self.spatial_size - self.kernel_size +
