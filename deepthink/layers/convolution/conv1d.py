@@ -74,9 +74,6 @@ class Conv1D(BaseConv):
                                  self.output_size * self.stride)
         self.backward_view_shape = (self.batch_size, self.spatial_size,
                                     self.n_filters, self.kernel_size)
-        # Dilate padding is used to pad the gradients before matrix-multiply
-        self.dilate_padding = (self.kernel_size - self.padding_amount - 1,
-                               self.kernel_size - 1)
 
         # Initialize weights and bias
         kernel_shape = (self.n_filters, self.n_channels, self.kernel_size)

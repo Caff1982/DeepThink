@@ -1,3 +1,5 @@
+import math
+
 from deepthink.layers.layer import BaseLayer
 
 
@@ -75,11 +77,11 @@ class BaseConv(BaseLayer):
         """
         # Set the padding to use in forward pass
         if self.padding_type == 'same':
-            # Add padding to keep output size same as input
-            self.padding_amount = ((self.spatial_size - 1) * self.stride
-                                   + self.kernel_size - self.spatial_size) // 2
+            self.output_size = math.ceil(self.spatial_size / self.stride)
+            self.padding_amount = ((self.spatial_size - self.output_size)
+                                   + (self.kernel_size - 1) + 1) // 2
             self.padding = (self.padding_amount, self.padding_amount)
-            self.output_size = self.spatial_size
+
         elif self.padding_type == 'valid':
             # Output size equation for is: [(spatial_size−K+2P)/S]+1
             self.output_size = ((self.spatial_size - self.kernel_size +
@@ -89,7 +91,6 @@ class BaseConv(BaseLayer):
                 "Invalid padding type. Must be 'valid' or 'same'."
             )
 
-        if self.output_size % self.stride != 0:
-            raise ValueError(
-                'Invalid output dimensions. Try changing ',
-                'kernel_size, stride or padding.')
+        # Dilate padding is used to pad the gradients before matrix-multiply
+        self.dilate_padding = (abs(self.kernel_size - self.padding_amount - 1),
+                               self.kernel_size - 1)

@@ -47,17 +47,15 @@ class Upsample3D(BaseLayer):
             height * scale_factor, width * scale_factor).
 
         """
-        self.output = np.repeat(
-            np.repeat(
-                np.repeat(
-                    inputs,
-                    self.scale_factor,
-                    axis=2),
+        # Use Kronecker product to upsample spatial dimensions
+        self.output = np.kron(
+            inputs,
+            np.ones((
                 self.scale_factor,
-                axis=3),
-            self.scale_factor,
-            axis=4
-        )
+                self.scale_factor,
+                self.scale_factor),
+                dtype=self.dtype
+            ))
         return self.output
 
     def backward(self, grads):

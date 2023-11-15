@@ -45,10 +45,12 @@ class Upsample1D(BaseLayer):
             seq-length * scale_factor).
 
         """
-        self.output = np.repeat(
+        # Use Kronecker product to upsample spatial dimension
+        self.output = np.kron(
             inputs,
-            self.scale_factor,
-            axis=2
+            np.ones(
+                (self.scale_factor),
+                dtype=self.dtype)
         )
         return self.output
 

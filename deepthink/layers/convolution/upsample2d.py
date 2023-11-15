@@ -46,14 +46,14 @@ class Upsample2D(BaseLayer):
             height * scale_factor, width * scale_factor).
 
         """
-        self.output = np.repeat(
-            np.repeat(
-                inputs,
+        # Use Kronecker product to upsample spatial dimensions
+        self.output = np.kron(
+            inputs,
+            np.ones((
                 self.scale_factor,
-                axis=2),
-            self.scale_factor,
-            axis=3
-        )
+                self.scale_factor),
+                dtype=self.dtype
+            ))
         return self.output
 
     def backward(self, grads):
@@ -74,5 +74,7 @@ class Upsample2D(BaseLayer):
             Gradients of the inputs.
         """
         self.dinputs = np.zeros(self.input_shape, dtype=self.dtype)
-        self.dinputs = grads[:, :, ::self.scale_factor, ::self.scale_factor]
+        self.dinputs = grads[:, :,
+                             ::self.scale_factor,
+                             ::self.scale_factor]
         return self.dinputs
