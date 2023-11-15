@@ -194,4 +194,4 @@ class MeanSquaredError(BaseLoss):
         """
         Return the gradients/derivative for y_true and y_hat.
         """
-        return -2 * (self.y_true - self.y_hat) / np.prod(self.y_true.shape)
+        return -2 * (self.y_true - self.y_hat) / self.y_true.size
