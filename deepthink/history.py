@@ -1,3 +1,4 @@
+import datetime
 import time
 
 import matplotlib.pyplot as plt
@@ -55,7 +56,7 @@ class History:
         self.metrics = metrics
         self.n_epochs = n_epochs
         self.verbose = verbose
-        
+
         if self.verbose:
             # Store training time for displaying updates
             self.start_time = time.time()
@@ -101,10 +102,11 @@ class History:
 
         if self.verbose:
             # Add epoch progress and elapsed time to row variable
-            elapsed_time = time.time() - self.start_time
+            elapsed_secs = time.time() - self.start_time
+            elapsed_time = datetime.timedelta(seconds=int(elapsed_secs))
             current_epoch = len(self.history['loss'])
             row = f"Epoch: {current_epoch}/{self.n_epochs}, " + \
-                  f"elapsed-time: {elapsed_time:.2f}s - "
+                  f"elapsed-time: {elapsed_time} - "
 
             # Add training cost/loss and all other metrics to row
             row += f"loss: {self.history['loss'][-1]:.4f} - "
