@@ -221,8 +221,8 @@ class Model:
             if shuffle:
                 # Shuffle training data
                 permutation = np.random.permutation(X_train.shape[0])
-                X_train_shuffled = X_train[permutation]
-                y_train_shuffled = y_train[permutation]
+                X_train = X_train[permutation]
+                y_train = y_train[permutation]
             # initialize model_outputs to store model predictions and
             # is used to evaluate performance at epoch end.
             model_outputs = np.zeros((num_batches * self.batch_size,
@@ -231,8 +231,8 @@ class Model:
             for batch_idx in tqdm(range(num_batches), disable=not verbose):
                 start = batch_idx * self.batch_size
                 end = start + self.batch_size
-                X_batch = X_train_shuffled[start:end]
-                y_batch = y_train_shuffled[start:end]
+                X_batch = X_train[start:end]
+                y_batch = y_train[start:end]
                 # Forward pass
                 outputs = self.forward(X_batch)
                 # Store outputs to be used for evaluation
@@ -244,7 +244,7 @@ class Model:
                 # Optimizer update
                 self.optimizer.update()
 
-            train_labels = y_train_shuffled[:model_outputs.shape[0]]
+            train_labels = y_train[:model_outputs.shape[0]]
             val_preds = self.get_predictions(X_val)
             val_labels = y_val[:val_preds.shape[0]]
             # Update history
