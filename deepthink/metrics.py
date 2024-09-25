@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def _set_array_lengths(y_true, y_hat):
+def _set_array_lengths(y_true: np.array, y_hat: np.array) -> tuple:
     """
     A helper function to resize arrays to the same length.
     If arrays are not the same length then they are resized
@@ -14,7 +14,7 @@ def _set_array_lengths(y_true, y_hat):
     return y_true, y_hat
 
 
-def mean_squared_error(y_true, y_hat):
+def mean_squared_error(y_true: np.array, y_hat: np.array) -> float:
     """
     Return the Mean Squared Error (MSE) loss between labels
     and predictions. MSE is calculated as the mean of the
@@ -36,7 +36,7 @@ def mean_squared_error(y_true, y_hat):
     return np.square(y_true - y_hat).mean()
 
 
-def root_mean_squared_error(y_true, y_hat):
+def root_mean_squared_error(y_true: np.array, y_hat: np.array) -> float:
     """
     Return the Root Mean Squared Error (RMSE) loss between labels
     and predictions. RMSE is the square root of the MSE.
@@ -57,7 +57,7 @@ def root_mean_squared_error(y_true, y_hat):
     return np.mean(np.sqrt(np.square(y_true - y_hat)))
 
 
-def mean_absolute_error(y_true, y_hat):
+def mean_absolute_error(y_true: np.array, y_hat: np.array) -> float:
     """
     Return the Mean Absolute Error (MSE) loss between labels
     and predictions. This is also known as the L1 loss.
@@ -78,7 +78,7 @@ def mean_absolute_error(y_true, y_hat):
     return np.mean(np.abs(y_true - y_hat))
 
 
-def accuracy(y_true, y_hat):
+def accuracy(y_true: np.array, y_hat: np.array) -> float:
     """
     Return how often predictions equal labels.
 
@@ -113,7 +113,7 @@ def accuracy(y_true, y_hat):
         return np.mean(np.argmax(y_true, axis=1) == np.argmax(y_hat, axis=1))
 
 
-def confusion_matrix(y_true, y_hat, k):
+def confusion_matrix(y_true: np.array, y_hat: np.array, k: int) -> np.array:
     """
     Return a 2D confusion matrix where the rows are the actual
     values and columns are predicted values. If arrays are 

@@ -1,12 +1,17 @@
 import os
 import pickle
+from typing import Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.datasets import fetch_openml
 
 
-def initialize_weights(shape, init_type, dtype=np.float32):
+def initialize_weights(
+    shape: tuple,
+    init_type: str,
+    dtype: type = np.float32,
+) -> np.array:
     """
     Return initialized weights for a trainable layer.
 
@@ -65,7 +70,12 @@ def initialize_weights(shape, init_type, dtype=np.float32):
         raise Exception(f'Weight init type "{init_type}" not recognized')
 
 
-def get_strided_view_1D(arr, view_shape, stride, writeable=False):
+def get_strided_view_1D(
+    arr: np.array,
+    view_shape: tuple,
+    stride: int,
+    writeable: bool = False,
+) -> np.array:
     """
     Return a view of an array using Numpy's as_strided
     slide-trick.
@@ -99,7 +109,12 @@ def get_strided_view_1D(arr, view_shape, stride, writeable=False):
         arr, view_shape, strides=strides, writeable=writeable)
 
 
-def get_strided_view_2D(arr, view_shape, stride, writeable=False):
+def get_strided_view_2D(
+    arr: np.array,
+    view_shape: tuple,
+    stride: int,
+    writeable: bool = False,
+) -> np.array:
     """
     Return a view of an array using Numpy's as_strided
     slide-trick.
@@ -134,7 +149,12 @@ def get_strided_view_2D(arr, view_shape, stride, writeable=False):
         arr, view_shape, strides=strides, writeable=writeable)
 
 
-def get_strided_view_3D(arr, view_shape, stride, writeable=False):
+def get_strided_view_3D(
+    arr: np.array,
+    view_shape: tuple,
+    stride: int,
+    writeable: bool = False,
+) -> np.array:
     """
     Return a view of an array using Numpy's as_strided
     slide-trick.
@@ -170,7 +190,7 @@ def get_strided_view_3D(arr, view_shape, stride, writeable=False):
         arr, view_shape, strides=strides, writeable=writeable)
 
 
-def pad_1D(arr, padding, mode='constant'):
+def pad_1D(arr: np.array, padding: tuple, mode: str = 'constant') -> np.array:
     """
     Return array with padding added to sequence dimension.
 
@@ -180,6 +200,8 @@ def pad_1D(arr, padding, mode='constant'):
         The array to perform the operation on.
     padding : tuple
         The amount of padding to add to the sequence dimension.
+    mode : str,default='constant'
+        The padding mode to use, 'constant' by default.
 
     Returns
     -------
@@ -194,16 +216,18 @@ def pad_1D(arr, padding, mode='constant'):
     )
 
 
-def pad_2D(arr, padding, mode='constant'):
+def pad_2D(arr: np.array, padding: tuple, mode: str = 'constant') -> np.array:
     """
-    Return array with padding added to height & width dimensions.
+    Return array with padding added to sequence dimension.
 
     Parameters
     ----------
     arr : np.array
         The array to perform the operation on.
     padding : tuple
-        The amount of padding to add to the height & width dimensions.
+        The amount of padding to add to the sequence dimension.
+    mode : str,default='constant'
+        The padding mode to use, 'constant' by default.
 
     Returns
     -------
@@ -219,17 +243,18 @@ def pad_2D(arr, padding, mode='constant'):
     )
 
 
-def pad_3D(arr, padding, mode='constant'):
+def pad_3D(arr: np.array, padding: tuple, mode: str = 'constant') -> np.array:
     """
-    Return array with padding added to height,
-    width & depth dimensions.
+    Return array with padding added to sequence dimension.
 
     Parameters
     ----------
     arr : np.array
         The array to perform the operation on.
     padding : tuple
-        The amount of padding to add to the spatial dimensions.
+        The amount of padding to add to the sequence dimension.
+    mode : str,default='constant'
+        The padding mode to use, 'constant' by default.
 
     Returns
     -------
@@ -246,7 +271,11 @@ def pad_3D(arr, padding, mode='constant'):
     )
 
 
-def one_hot_encode(arr,  k, dtype=np.float32):
+def one_hot_encode(
+    arr: np.array,
+    k: int,
+    dtype: type = np.float32,
+) -> np.array:
     """
     Takes 1D array of target integer values and return a
     one-hot-encoded 2D array.
@@ -268,7 +297,7 @@ def one_hot_encode(arr,  k, dtype=np.float32):
     return np.eye(k, dtype=dtype)[arr]
 
 
-def pad_sequences(sequences, maxlen):
+def pad_sequences(sequences: np.array, maxlen: int) -> np.ndarray:
     """
     Pad sequences to a fixed length maxlen.
 
@@ -277,8 +306,8 @@ def pad_sequences(sequences, maxlen):
 
     Parameters
     ----------
-    sequences : list
-        List of sequences to pad.
+    sequences : np.array
+        The sequences to pad, 1D np.array of integers.
     maxlen : int
         Maximum length of each sequence.
 
@@ -296,8 +325,12 @@ def pad_sequences(sequences, maxlen):
     return padded_sequences
 
 
-def load_mnist_data(filepath=None, test_split=60000,
-                    shuffle=True, flat_data=False):
+def load_mnist_data(
+    filepath: str = None,
+    test_split: int = 60000,
+    shuffle: bool = True,
+    flat_data: bool = False,
+) -> Tuple[Tuple[np.array, np.array], Tuple[np.array, np.array]]:
     """
     A function to load and prepare the MNIST dataset.
 

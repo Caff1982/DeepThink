@@ -27,8 +27,14 @@ class BaseOptimizer:
         This is added during initialization.
     """
 
-    def __init__(self, learning_rate, lr_decay=None, init_lr=None,
-                 min_lr=0.0, iteration=0, layers=None):
+    def __init__(self,
+        learning_rate: float,
+        lr_decay: float = None,
+        init_lr: float = None,
+        min_lr: float = 0.0,
+        iteration: int = 0,
+        layers: list = None
+    ):
         self.learning_rate = learning_rate
         self.lr_decay = lr_decay
         self.init_lr = init_lr
@@ -39,7 +45,7 @@ class BaseOptimizer:
     def __repr__(self):
         return f'{self.__class__.__name__} Optimizer'
 
-    def initialize(self, layers):
+    def initialize(self, layers: list) -> None:
         """
         Initialize optimizer to begin training.
 
@@ -52,7 +58,7 @@ class BaseOptimizer:
         self.iteration = 0
         self.layers = layers
 
-    def on_batch_end(self):
+    def on_batch_end(self) -> None:
         """
         This should be called after each batch-update to increment the
         iteration and update the learning rate.
@@ -88,14 +94,14 @@ class SGD(BaseOptimizer):
         Should be in range 0-1 with zero being no momentum added.
     """
 
-    def __init__(self, learning_rate, momentum=None, **kwargs):
+    def __init__(self, learning_rate: float, momentum: float = None, **kwargs):
         super().__init__(
             learning_rate=learning_rate,
             **kwargs
         )
         self.momentum = momentum
 
-    def update(self):
+    def update(self) -> None:
         """
         Perform one SGD batch update by looping through layers and
         applying updates to each layer with weights & biases.
@@ -149,14 +155,14 @@ class NAG(BaseOptimizer):
     - https://cs231n.github.io/neural-networks-3/#sgd
     """
 
-    def __init__(self, learning_rate, momentum=0.9, **kwargs):
+    def __init__(self, learning_rate: float, momentum: float = 0.9, **kwargs):
         super().__init__(
             learning_rate=learning_rate,
             **kwargs
         )
         self.momentum = momentum
 
-    def update(self):
+    def update(self) -> None:
         """
         Perform one batch update by looping through layers and applying
         updates to each layer with weights & biases.
@@ -203,14 +209,14 @@ class AdaGrad(BaseOptimizer):
     epsilon : float,default=1e-7
         A constant used to prevent division by zero errors.
     """
-    def __init__(self, learning_rate, epsilon=1e-7, **kwargs):
+    def __init__(self, learning_rate: float, epsilon: float = 1e-7, **kwargs):
         super().__init__(
             learning_rate=learning_rate,
             **kwargs
         )
         self.epsilon = epsilon
 
-    def update(self):
+    def update(self) -> None:
         """
         Perform one batch update by looping through layers and applying
         updates to each layer with weights & biases
@@ -260,7 +266,12 @@ class RMSProp(BaseOptimizer):
     epsilon : float,default=1e-7
         A constant used to prevent division by zero errors.
     """
-    def __init__(self, learning_rate, rho=0.9, epsilon=1e-7, **kwargs):
+    def __init__(self,
+        learning_rate: float,
+        rho: float = 0.9,
+        epsilon: float = 1e-7,
+        **kwargs
+    ):
         super().__init__(
             learning_rate=learning_rate,
             **kwargs
@@ -268,7 +279,7 @@ class RMSProp(BaseOptimizer):
         self.rho = rho
         self.epsilon = epsilon
 
-    def update(self):
+    def update(self) -> None:
         """
         Perform one batch update by looping through layers and
         applying updates to each layer with weights & biases
@@ -322,8 +333,13 @@ class Adam(BaseOptimizer):
     epsilon : float,default=1e-7
         A constant used to prevent division by zero errors.
     """
-    def __init__(self, learning_rate, beta1=0.9, beta2=0.999,
-                 epsilon=1e-7, **kwargs):
+    def __init__(self, 
+        learning_rate: float,
+        beta1: float = 0.9,
+        beta2: float = 0.999,
+        epsilon: float = 1e-7,
+        **kwargs
+    ):
         super().__init__(
             learning_rate=learning_rate,
             **kwargs
@@ -332,7 +348,7 @@ class Adam(BaseOptimizer):
         self.beta2 = beta2
         self.epsilon = epsilon
 
-    def update(self):
+    def update(self) -> None:
         """
         Perform one batch update by looping through layers and applying
         updates to each layer with weights & biases
