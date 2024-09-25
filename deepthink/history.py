@@ -1,8 +1,10 @@
 import datetime
 import time
+from typing import List
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+import numpy as np
 
 from deepthink.metrics import (mean_squared_error,
                                root_mean_squared_error,
@@ -52,13 +54,17 @@ class History:
         'MSE': mean_squared_error,
         }
 
-    def __init__(self, metrics, n_epochs, verbose=True):
+    def __init__(self,
+        metrics: List[str],
+        n_epochs: int,
+        verbose: bool = True,
+    ) -> None:
         self.metrics = metrics
         self.n_epochs = n_epochs
         self.verbose = verbose
 
         if self.verbose:
-            # Store training time for displaying updates
+            # Initialize timer to track elapsed time
             self.start_time = time.time()
 
         self.history = {}
@@ -70,7 +76,12 @@ class History:
             self.history[metric] = []
             self.history[f'val_{metric}'] = []
 
-    def on_epoch_end(self, y_train, train_preds, y_val, val_preds):
+    def on_epoch_end(self,
+        y_train: np.ndarray,
+        train_preds: np.ndarray,
+        y_val: np.ndarray = None,
+        val_preds: np.ndarray = None,
+    ) -> None:
         """
         This method calculates the current performance on all metrics
         and stores them in the history dictionary. When verbose is set
@@ -82,23 +93,25 @@ class History:
             The y-target training values
         train_preds : np.array
             The model's training predictions
-        y_val : np.array
+        y_val : np.array,default=None
             The y-target validation values
-        val_preds : np.array
+        val_preds : np.array,default=None
             The model's validation predictions
         """
         # Get and store the model's loss/cost function
         train_loss = self.metrics[0](y_train, train_preds)
-        val_loss = self.metrics[0](y_val, val_preds)
         self.history['loss'].append(train_loss)
-        self.history['val_loss'].append(val_loss)
+        if y_val:
+            val_loss = self.metrics[0](y_val, val_preds)
+            self.history['val_loss'].append(val_loss)
 
         for metric in self.metrics[1:]:
-            # Get train & validation value for each metric
+            # Get values for each metric and store in history
             train_value = self.metric_dict[metric](y_train, train_preds)
-            val_value = self.metric_dict[metric](y_val, val_preds)
             self.history[metric].append(train_value)
-            self.history[f'val_{metric}'].append(val_value)
+            if y_val:
+                val_value = self.metric_dict[metric](y_val, val_preds)
+                self.history[f'val_{metric}'].append(val_value)
 
         if self.verbose:
             # Add epoch progress and elapsed time to row variable
@@ -113,15 +126,19 @@ class History:
             for metric in self.metrics[1:]:
                 last_value = self.history[metric][-1]
                 row += f"{metric}: {last_value:.4f} - "
-            # Add validation loss and metrics to row
-            row += f"val_loss: {self.history['val_loss'][-1]:.4f} - "
-            for metric in self.metrics[1:]:
-                last_value = self.history['val_' + metric][-1]
-                row += f"val_{metric}: {last_value:.4f} - "
+            if y_val:
+                # Add validation cost/loss and all other metrics to row
+                row += f"val_loss: {self.history['val_loss'][-1]:.4f} - "
+                for metric in self.metrics[1:]:
+                    last_value = self.history['val_' + metric][-1]
+                    row += f"val_{metric}: {last_value:.4f} - "
             # Display row
             print(row)
 
-    def plot_history(self, display_image=True, save_fname=None):
+    def plot_history(self,
+        display_image: bool = True,
+        save_fname: str = None,
+    ) -> None:
         """
         Display model training performance at each epoch.
 
@@ -150,8 +167,9 @@ class History:
 
         # Plot the model's loss performance
         axes[0].plot(self.history['loss'], label='Train loss')
-        axes[0].plot(self.history['val_loss'], label='Val loss')
         axes[0].set_ylabel('Loss', fontsize='x-large')
+        if 'val_loss' in self.history:
+            axes[0].plot(self.history['val_loss'], label='Val loss')
         axes[0].legend(fontsize='large', framealpha=1, fancybox=True)
         axes[0].set_xticks(ticks=x_labels, labels=x_labels)
         # MaxNLocator used to dynamically set xtick locations
@@ -161,7 +179,8 @@ class History:
             # Plot additional metric if included
             metric = self.metrics[1]
             axes[1].plot(self.history[metric], label=f'Train {metric}')
-            axes[1].plot(self.history[f'val_{metric}'], label=f'Val {metric}')
+            if f'val_{metric}' in self.history:
+                axes[1].plot(self.history[f'val_{metric}'], label=f'Val {metric}')
             axes[1].set_ylabel(metric.capitalize(), fontsize='x-large')
             axes[1].legend(fontsize='large', framealpha=1, fancybox=True)
             axes[1].set_xticks(ticks=x_labels, labels=x_labels)
