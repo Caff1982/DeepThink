@@ -19,7 +19,7 @@ class BaseLoss:
     def __repr__(self):
         return f'{self.__class__.__name__}'
 
-    def __call__(self, y_true, y_hat):
+    def __call__(self, y_true: np.array, y_hat: np.array) -> np.array:
         # If arrays are not the same length then resize
         if y_true.shape != y_hat.shape:
             min_len = min(y_true.shape[0], y_hat.shape[0])
@@ -27,12 +27,12 @@ class BaseLoss:
             y_hat = y_hat[:min_len]
         return self.loss(y_true, y_hat)
 
-    def loss(self, y_true, y_hat):
+    def loss(self, y_true: np.array, y_hat: np.array) -> np.array:
         raise NotImplementedError(
             'All loss classes must implement a "loss" method'
         )
 
-    def grads(self):
+    def grads(self) -> np.array:
         raise NotImplementedError(
             'All loss classes must implement a "grads" method'
         )
@@ -54,7 +54,11 @@ class CategoricalCrossEntropy(BaseLoss):
     - https://en.wikipedia.org/wiki/Cross_entropy
     """
 
-    def loss(self, y_true, y_hat, epsilon=1e-7):
+    def loss(self,
+        y_true: np.array,
+        y_hat: np.array,
+        epsilon: float = 1e-7
+    ) -> float:
         """
         Return the categorical crossentropy (CCE) loss between labels
         and predictions.
@@ -86,7 +90,7 @@ class CategoricalCrossEntropy(BaseLoss):
         cce_loss = np.sum(y_true.T * -np.log(y_hat.T)) / y_true.shape[0]
         return cce_loss
 
-    def grads(self):
+    def grads(self) -> np.array:
         """
         Return the gradients/derivative for y_true and y_hat.
 
@@ -108,7 +112,11 @@ class BinaryCrossEntropy(BaseLoss):
     classification tasks.
     """
 
-    def loss(self, y_true, y_hat, epsilon=1e-7):
+    def loss(self,
+        y_true: np.array,
+        y_hat: np.array,
+        epsilon: float = 1e-7
+    ) -> float:
         """
         Return the binary crossentropy (BCE) loss between labels
         and predictions.
@@ -140,7 +148,7 @@ class BinaryCrossEntropy(BaseLoss):
                             + (1-y_true) * np.log(1-y_hat_clip))
         return bce_loss
 
-    def grads(self):
+    def grads(self) -> np.array:
         """
         Return the gradients/derivative for y_true and y_hat.
 
@@ -167,7 +175,10 @@ class MeanSquaredError(BaseLoss):
 
     """
 
-    def loss(self, y_true, y_hat):
+    def loss(self,
+        y_true: np.array,
+        y_hat: np.array,
+    ) -> float:
         """
         Return the Mean Squared Error (MSE) loss between labels and
         predictions. Both arrays should be the same length.
@@ -190,7 +201,7 @@ class MeanSquaredError(BaseLoss):
         self.output = np.square(y_true - y_hat).mean()
         return self.output
 
-    def grads(self):
+    def grads(self) -> np.array:
         """
         Return the gradients/derivative for y_true and y_hat.
         """

@@ -22,10 +22,10 @@ class Sigmoid:
     def __repr__(self):
         return 'Sigmoid'
 
-    def __call__(self, x):
+    def __call__(self, x: np.array) -> np.array:
         return self.forward(x)
 
-    def forward(self, x):
+    def forward(self, x: np.array) -> np.array:
         """
         Return the input array with sigmoid activation applied.
 
@@ -35,7 +35,7 @@ class Sigmoid:
         self.output = 1.0 / (1.0 + np.exp(-x))
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> np.array:
         """
         Return the derivative of sigmoid function.
 
@@ -61,10 +61,10 @@ class ReLU:
     def __repr__(self):
         return 'ReLU'
 
-    def __call__(self, x):
+    def __call__(self, x: np.array) -> np.array:
         return self.forward(x)
 
-    def forward(self, x):
+    def forward(self, x: np.array) -> np.array:
         """
         Return the input array with ReLU activation applied.
 
@@ -75,7 +75,7 @@ class ReLU:
         self.output = np.maximum(0, x)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> np.array:
         """
         Return the derivative of ReLU function.
 
@@ -105,16 +105,16 @@ class LeakyReLU:
     - https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Variants
     - https://arxiv.org/pdf/1505.00853.pdf
     """
-    def __init__(self, alpha=0.1):
+    def __init__(self, alpha: float = 0.1):
         self.alpha = alpha
 
     def __repr__(self):
         return 'Leaky-ReLU'
 
-    def __call__(self, x):
+    def __call__(self, x: np.array) -> np.array:
         return self.forward(x)
 
-    def forward(self, x):
+    def forward(self, x: np.array) -> np.array:
         """
         Return the input array with Leaky ReLU activation applied.
 
@@ -125,7 +125,7 @@ class LeakyReLU:
         self.output = np.where(x < 0, x * self.alpha, x)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> np.array:
         """
         Return the derivative of Leaky ReLU function.
 
@@ -150,16 +150,16 @@ class ELU:
     ----------
     - https://en.wikipedia.org/wiki/Rectifier_(neural_networks)#Variants
     """
-    def __init__(self, alpha=1.0):
+    def __init__(self, alpha: float = 1.0):
         self.alpha = alpha
 
     def __repr__(self):
         return 'ELU'
 
-    def __call__(self, x):
+    def __call__(self, x: np.array) -> np.array:
         return self.forward(x)
 
-    def forward(self, x):
+    def forward(self, x: np.array) -> np.array:
         """
         Return the input array with ELU activation applied.
 
@@ -170,7 +170,7 @@ class ELU:
         self.output = np.where(x < 0, self.alpha * (np.exp(x) - 1.0), x)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> np.array:
         """
         Return the derivative of ELU function.
 
@@ -196,10 +196,10 @@ class TanH:
     def __repr__(self):
         return 'TanH'
 
-    def __call__(self, x):
+    def __call__(self, x: np.array) -> np.array:
         return self.forward(x)
 
-    def forward(self, x):
+    def forward(self, x: np.array) -> np.array:
         """
         Return the input array with tanh activation applied.
 
@@ -209,7 +209,7 @@ class TanH:
         self.output = np.tanh(x)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> np.array:
         """
         Return the derivative of tanh function.
 
@@ -242,10 +242,10 @@ class Softmax:
     def __repr__(self):
         return 'Softmax'
 
-    def __call__(self, x):
+    def __call__(self, x: np.array) -> np.array:
         return self.forward(x)
 
-    def forward(self, x):
+    def forward(self, x: np.array) -> np.array:
         """
         Return the array with softmax activation applied.
 
