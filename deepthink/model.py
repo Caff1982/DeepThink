@@ -1,4 +1,5 @@
 import pickle
+from typing import Tuple
 
 import numpy as np
 from tqdm import tqdm
@@ -34,8 +35,13 @@ class Model:
         np.float64 is required for gradient checking
     """
 
-    def __init__(self, optimizer, cost, batch_size=64,
-                 metrics=None, dtype=np.float32):
+    def __init__(self,
+        optimizer: object,
+        cost: object,
+        batch_size: int = 64,
+        metrics: list = None,
+        dtype: type = np.float32
+    ):
         self.optimizer = optimizer
         self.cost = cost
         self.batch_size = batch_size
@@ -51,7 +57,7 @@ class Model:
         # Initialize layers array to store the network's layers
         self._layers = []
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize model parameters before training.
 
@@ -87,7 +93,7 @@ class Model:
         # Set layers array attribute in optimizer
         self.optimizer.initialize(self._layers)
 
-    def summary(self, line_length=65):
+    def summary(self, line_length: int = 65) -> None:
         """
         Print a summary of the model.
 
@@ -117,7 +123,7 @@ class Model:
         print('=' * line_length)
         print(f'Total params: {num_params}')
 
-    def add_layer(self, layer):
+    def add_layer(self, layer: object) -> None:
         """
         Add a layer instance to the _layers array.
 
@@ -128,7 +134,7 @@ class Model:
         """
         self._layers.append(layer)
 
-    def forward(self, X, training=True):
+    def forward(self, X: np.ndarray, training: bool = True) -> np.ndarray:
         """
         Perform a forward pass through the network layers.
 
@@ -152,7 +158,7 @@ class Model:
                 X = layer.forward(X)
         return X
 
-    def backward(self, dZ):
+    def backward(self, dZ: np.ndarray) -> None:
         """
         Perform backpropagation.
 
@@ -177,8 +183,13 @@ class Model:
         for layer in reversed(self._layers[:-1]):
             layer.backward(layer.next_layer.dinputs)
 
-    def train(self, training_data, validation_data,
-              epochs=10, verbose=True, shuffle=True):
+    def train(self,
+        training_data: Tuple[np.ndarray, np.ndarray],
+        validation_data: Tuple[np.ndarray, np.ndarray],
+        epochs: int = 10,
+        verbose: bool = True,
+        shuffle: bool = True
+    ) -> History:
         """
         Used to train the model for a number of epochs.
 
@@ -252,7 +263,7 @@ class Model:
                                       val_labels, val_preds)
         return self.history
 
-    def get_predictions(self, X):
+    def get_predictions(self, X: np.ndarray) -> np.ndarray:
         """
         Get the models predictions for a batch of data.
 
@@ -286,8 +297,7 @@ class Model:
 
         # Create the array to store predictions
         predictions = np.zeros((len_preds, *self._layers[-1].output.shape[1:]))
-        # batch_id is used as current batch index
-        batch_id = 0
+        batch_id = 0  # batch_id is used as current batch index
         while batch_id < len_preds:
             batch_preds = self.forward(X[batch_id:batch_id + self.batch_size],
                                        training=False)
@@ -299,7 +309,7 @@ class Model:
         else:
             return predictions
 
-    def get_params(self):
+    def get_params(self) -> np.ndarray:
         """
         Return model weights & biases for each layer
         unrolled into a 1D vector.
@@ -312,7 +322,7 @@ class Model:
                 params.extend(layer.bias.flatten())
         return np.array(params)
 
-    def set_params(self, params):
+    def set_params(self, params: np.ndarray) -> None:
         """
         Takes 1D vector and uses that to set model
         weights and biases
@@ -328,7 +338,7 @@ class Model:
                 layer.bias = bias_arr.reshape(layer.bias.shape)
                 idx += layer.bias.size
 
-    def save(self, filepath, weights_only=False):
+    def save(self, filepath: str, weights_only: bool = False) -> None:
         """
         Save the model's weights & biases (and optionally the entire model)
         to the specified filepath.
@@ -351,7 +361,7 @@ class Model:
             with open(filepath, 'wb') as file:
                 pickle.dump(self, file)
 
-    def load_weights(self, filepath):
+    def load_weights(self, filepath: str) -> None:
         """
         Load model weights and biases from the specified filepath.
 
@@ -364,7 +374,7 @@ class Model:
         self.set_params(params)
 
     @staticmethod
-    def load_model(filepath):
+    def load_model(filepath: str) -> 'Model':
         """
         Load the entire model from the specified filepath.
 

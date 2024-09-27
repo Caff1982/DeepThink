@@ -101,7 +101,7 @@ class History:
         # Get and store the model's loss/cost function
         train_loss = self.metrics[0](y_train, train_preds)
         self.history['loss'].append(train_loss)
-        if y_val:
+        if y_val is not None:
             val_loss = self.metrics[0](y_val, val_preds)
             self.history['val_loss'].append(val_loss)
 
@@ -109,7 +109,7 @@ class History:
             # Get values for each metric and store in history
             train_value = self.metric_dict[metric](y_train, train_preds)
             self.history[metric].append(train_value)
-            if y_val:
+            if y_val is not None:
                 val_value = self.metric_dict[metric](y_val, val_preds)
                 self.history[f'val_{metric}'].append(val_value)
 
@@ -126,7 +126,7 @@ class History:
             for metric in self.metrics[1:]:
                 last_value = self.history[metric][-1]
                 row += f"{metric}: {last_value:.4f} - "
-            if y_val:
+            if y_val is not None:
                 # Add validation cost/loss and all other metrics to row
                 row += f"val_loss: {self.history['val_loss'][-1]:.4f} - "
                 for metric in self.metrics[1:]:
@@ -168,7 +168,7 @@ class History:
         # Plot the model's loss performance
         axes[0].plot(self.history['loss'], label='Train loss')
         axes[0].set_ylabel('Loss', fontsize='x-large')
-        if 'val_loss' in self.history:
+        if len(self.history['val_loss']) > 0:
             axes[0].plot(self.history['val_loss'], label='Val loss')
         axes[0].legend(fontsize='large', framealpha=1, fancybox=True)
         axes[0].set_xticks(ticks=x_labels, labels=x_labels)
@@ -179,7 +179,7 @@ class History:
             # Plot additional metric if included
             metric = self.metrics[1]
             axes[1].plot(self.history[metric], label=f'Train {metric}')
-            if f'val_{metric}' in self.history:
+            if len(self.history['val_loss']) > 0:
                 axes[1].plot(self.history[f'val_{metric}'], label=f'Val {metric}')
             axes[1].set_ylabel(metric.capitalize(), fontsize='x-large')
             axes[1].legend(fontsize='large', framealpha=1, fancybox=True)
