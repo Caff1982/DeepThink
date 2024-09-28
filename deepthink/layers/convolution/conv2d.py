@@ -36,11 +36,11 @@ class Conv2D(BaseConv):
     """
     def __init__(
         self,
-        kernel_size,
-        n_filters,
-        stride=1,
-        padding_type='valid',
-        input_shape=None,
+        kernel_size: int,
+        n_filters: int,
+        stride: int = 1,
+        padding_type: str = 'valid',
+        input_shape: tuple = None,
         **kwargs,
     ):
         super().__init__(
@@ -52,7 +52,7 @@ class Conv2D(BaseConv):
             **kwargs
         )
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training.
         """
@@ -90,7 +90,7 @@ class Conv2D(BaseConv):
         self.weight_grad_cache = np.zeros(self.weights.shape, dtype=self.dtype)
         self.bias_grad_cache = np.zeros(self.bias.shape, dtype=self.dtype)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform one forward pass of the convolution layer.
 
@@ -141,7 +141,7 @@ class Conv2D(BaseConv):
         self.output = self.output.transpose(1, 0, 2, 3)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform one backward pass of the convolution layer.
 

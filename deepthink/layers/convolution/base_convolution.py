@@ -23,10 +23,10 @@ class BaseConv(BaseLayer):
     """
     def __init__(
         self,
-        kernel_size,
-        n_filters,
-        stride=1,
-        padding_type='valid',
+        kernel_size: int,
+        n_filters: int,
+        stride: int = 1,
+        padding_type: str = 'valid',
         **kwargs,
     ):
         super().__init__(
@@ -69,7 +69,7 @@ class BaseConv(BaseLayer):
         self.weight_grad_cache = None
         self.bias_grad_cache = None
 
-    def _set_padding_and_output_size(self):
+    def _set_padding_and_output_size(self) -> None:
         """
         This method sets the padding and output size attributes based on
         the padding type and stride. It should be called in the initialize

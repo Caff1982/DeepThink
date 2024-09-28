@@ -36,9 +36,14 @@ class BaseLayer:
         The numpy datatype to be used. Uses np.float32 by default,
         np.float64 is required for gradient checking.
     """
-    def __init__(self, prev_layer=None, next_layer=None,
-                 input_shape=None, weight_init='he_uniform',
-                 dtype=np.float32):
+    def __init__(
+        self,
+        prev_layer: object = None,
+        next_layer: object = None,
+        input_shape: tuple = None,
+        weight_init: str = 'he_uniform',
+        dtype: type = np.float32,
+    ):
         self.prev_layer = prev_layer
         self.next_layer = next_layer
         self.input_shape = input_shape
@@ -54,7 +59,7 @@ class BaseLayer:
         self.bias_grad_cache = None
 
     @property
-    def input_shape(self):
+    def input_shape(self) -> tuple:
         # If the _input_shape is not set, infer it from the previous layer
         if self._input_shape is None:
             if self.prev_layer is None:
@@ -65,10 +70,10 @@ class BaseLayer:
         return self._input_shape
 
     @input_shape.setter
-    def input_shape(self, shape):
+    def input_shape(self, shape: tuple) -> None:
         self._input_shape = shape
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'{self.__class__.__name__}'
 
     def initialize(self):

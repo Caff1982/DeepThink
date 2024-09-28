@@ -12,11 +12,11 @@ class Flatten(BaseLayer):
     reshape output from convolution/pooling layers to be
     used as input for a Dense layer.
     """
-    def __init__(self, input_shape=None, **kwargs):
+    def __init__(self, input_shape: tuple = None, **kwargs):
         super().__init__(**kwargs)
         self.input_shape = input_shape
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training
         """
@@ -30,14 +30,14 @@ class Flatten(BaseLayer):
             self.input_shape,
             dtype=self.dtype).reshape((self.input_shape[0], -1))
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform one forward pass by flattening input array.
         """
         self.output = inputs.ravel().reshape(self.output.shape)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backward pass.
 

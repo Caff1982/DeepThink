@@ -6,7 +6,13 @@ from deepthink.layers.layer import BaseLayer
 class BaseGlobalPooling(BaseLayer):
     """Base class for global average pooling layers."""
 
-    def __init__(self, axes, keep_dims=False, input_shape=None, **kwargs):
+    def __init__(
+        self,
+        axes: tuple,
+        keep_dims: bool = False,
+        input_shape: tuple = None,
+        **kwargs
+    ):
         super().__init__(
             input_shape=input_shape,
             **kwargs)
@@ -17,7 +23,7 @@ class BaseGlobalPooling(BaseLayer):
         self.spatial_size = None  # spatial size of input
         self.scaling_factor = None  # Number of elements in ouput feature map
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training.
 
@@ -37,7 +43,7 @@ class BaseGlobalPooling(BaseLayer):
         self.spatial_size = self.input_shape[-1]
         self.scaling_factor = self.spatial_size ** len(self.axes)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform the forward pass on input tensor.
 

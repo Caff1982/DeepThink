@@ -20,15 +20,20 @@ class Dense(BaseLayer):
         Input shape. Required if first layer, otherwise calculated
         during initialization. Should have shape (N, D).
     """
-    def __init__(self, n_neurons, input_shape=None, **kwargs):
+    def __init__(
+        self,
+        n_neurons: int,
+        input_shape: tuple = None,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.n_neurons = n_neurons
         self.input_shape = input_shape
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Dense({self.n_neurons})'
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training
         """
@@ -61,7 +66,7 @@ class Dense(BaseLayer):
         self.bias_grad_cache = np.zeros(self.bias.shape,
                                         dtype=self.dtype)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform one forward pass on inputs.
         """
@@ -70,7 +75,7 @@ class Dense(BaseLayer):
         self.output = np.dot(inputs, self.weights) + self.bias
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backpropagation by computing partial
         derivatives for weights, bias and inputs.

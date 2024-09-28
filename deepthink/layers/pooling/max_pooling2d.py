@@ -22,14 +22,14 @@ class MaxPooling2D(BasePooling):
     stride : int
         The step size between each pooling window.
     """
-    def __init__(self, pool_size=2, stride=2, **kwargs):
+    def __init__(self, pool_size: int = 2, stride: int = 2, **kwargs):
         super().__init__(
             pool_size=pool_size,
             stride=stride,
             **kwargs
         )
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training
         """
@@ -44,7 +44,7 @@ class MaxPooling2D(BasePooling):
                                    self.output_size, self.n_channels,
                                    self.pool_size, self.pool_size)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform one forward pass of MaxPooling operation.
 
@@ -71,7 +71,7 @@ class MaxPooling2D(BasePooling):
         self.output = self.output.transpose(0, 3, 1, 2)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backward pass.
 
@@ -98,5 +98,3 @@ class MaxPooling2D(BasePooling):
         iw2 = (iw * self.stride) + ix
         # Use the indices to allocate the gradients correctly
         self.dinputs[im, ic, ih2, iw2] = grads[im, ic, ih, iw]
-
-        return self.dinputs

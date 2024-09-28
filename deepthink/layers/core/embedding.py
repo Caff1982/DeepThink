@@ -21,11 +21,11 @@ class Embedding(BaseLayer):
     """
     def __init__(
         self,
-        vocab_size,
-        emb_dims,
-        input_shape,
-        weight_init='uniform',
-        **kwargs
+        vocab_size: int,
+        emb_dims: int,
+        input_shape: tuple,
+        weight_init: str = 'uniform',
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.vocab_size = vocab_size
@@ -34,7 +34,7 @@ class Embedding(BaseLayer):
         self.seq_len = input_shape[-1]
         self.weight_init = weight_init
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize the embedding layer.
         """
@@ -50,7 +50,7 @@ class Embedding(BaseLayer):
         # Initialize arrays to store optimizer gradient cache
         self.weight_grad_cache = np.zeros(weights_shape, dtype=self.dtype)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform the forward pass on inputs.
 
@@ -69,7 +69,7 @@ class Embedding(BaseLayer):
         self.output = self.weights[inputs].transpose(0, 2, 1)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backpropagation by computing the gradients.
 

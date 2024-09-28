@@ -29,7 +29,7 @@ class AveragePooling1D(BasePooling):
         to the number of elements in the pooling window. Used
         to scale the gradients during backpropagation.
     """
-    def __init__(self, pool_size=2, stride=2, **kwargs):
+    def __init__(self, pool_size: int = 2, stride: int = 2, **kwargs):
         super().__init__(
             pool_size=pool_size,
             stride=stride,
@@ -38,7 +38,7 @@ class AveragePooling1D(BasePooling):
         # Calculate scaling factor for mean pooling backprop
         self.scaling_factor = self.pool_size
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training.
         """
@@ -51,7 +51,7 @@ class AveragePooling1D(BasePooling):
         self.forward_view_shape = (self.batch_size, self.output_size,
                                    self.n_channels, self.pool_size)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform one forward pass of average pooling operation.
 
@@ -75,7 +75,7 @@ class AveragePooling1D(BasePooling):
         self.output = self.output.transpose(0, 2, 1)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backward pass.
 
@@ -94,4 +94,3 @@ class AveragePooling1D(BasePooling):
         """
         self.dinputs = np.tile(grads / self.scaling_factor,
                                self.input_shape)
-        return self.dinputs

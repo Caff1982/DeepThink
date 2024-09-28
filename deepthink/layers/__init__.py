@@ -1,3 +1,4 @@
+from deepthink.layers.layer import BaseLayer
 from deepthink.layers.core.dense import Dense
 from deepthink.layers.core.embedding import Embedding
 from deepthink.layers.core.flatten import Flatten

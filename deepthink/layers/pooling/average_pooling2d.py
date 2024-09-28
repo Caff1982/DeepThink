@@ -28,7 +28,7 @@ class AveragePooling2D(BasePooling):
         The factor by which the output is scaled. This is equal
         to the number of elements in the pooling window.
     """
-    def __init__(self, pool_size=2, stride=2, **kwargs):
+    def __init__(self, pool_size: int = 2, stride: int = 2, **kwargs):
         super().__init__(
             pool_size=pool_size,
             stride=stride,
@@ -37,7 +37,7 @@ class AveragePooling2D(BasePooling):
         # Calculate scaling factor for mean pooling backprop
         self.scaling_factor = self.pool_size**2
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training.
         """
@@ -52,7 +52,7 @@ class AveragePooling2D(BasePooling):
                                    self.output_size, self.n_channels,
                                    self.pool_size, self.pool_size)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform one forward pass of average pooling operation.
 
@@ -76,7 +76,7 @@ class AveragePooling2D(BasePooling):
         self.output = self.output.transpose(0, 3, 1, 2)
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backward pass.
 
@@ -95,4 +95,3 @@ class AveragePooling2D(BasePooling):
         """
         self.dinputs = np.tile(grads / self.scaling_factor,
                                self.input_shape)
-        return self.dinputs

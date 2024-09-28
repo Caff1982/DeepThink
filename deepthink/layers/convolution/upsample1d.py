@@ -16,11 +16,11 @@ class Upsample1D(BaseLayer):
         `scale_factor * input_size`.
     """
 
-    def __init__(self, scale_factor=2, **kwargs):
+    def __init__(self, scale_factor: int = 2, **kwargs):
         super().__init__(**kwargs)
         self.scale_factor = scale_factor
 
-    def initialize(self):
+    def initialize(self) -> None:
         """Initialize output shape."""
         upsample_size = self.input_shape[-1] * self.scale_factor
         self.output = np.zeros((
@@ -29,7 +29,7 @@ class Upsample1D(BaseLayer):
             upsample_size),
             dtype=self.dtype)
 
-    def forward(self, inputs):
+    def forward(self, inputs: np.array) -> np.array:
         """
         Perform forward pass.
 
@@ -54,7 +54,7 @@ class Upsample1D(BaseLayer):
         )
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backward pass.
 
@@ -73,4 +73,3 @@ class Upsample1D(BaseLayer):
         """
         self.dinputs = np.zeros(self.input_shape, dtype=self.dtype)
         self.dinputs = grads[:, :, ::self.scale_factor]
-        return self.dinputs

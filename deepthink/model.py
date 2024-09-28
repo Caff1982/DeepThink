@@ -6,6 +6,9 @@ from tqdm import tqdm
 
 from deepthink.history import History
 from deepthink.layers import Dropout, BatchNorm
+from deepthink.optimizers import BaseOptimizer
+from deepthink.loss import BaseLoss
+from deepthink.layers import BaseLayer
 
 
 class Model:
@@ -19,10 +22,12 @@ class Model:
 
     Parameters
     ----------
-    optimizer : (any optimizer from optimizers.py)
-        The optimizer to use to perform updates.
-    cost : (cost function)
-        The cost/loss function to use.
+    optimizer : BaseOptimizer
+        The optimizer to use to perform updates. Any sub-class of
+        BaseOptimizer from optimizers.py.
+    cost : BaseLoss
+        The loss function to use to calculate the error. Any sub-class
+        of BaseLoss from loss.py.
     batch_size : int,default=64
         The number of samples in each mini-batch at each update
     metrics : list,default=None
@@ -36,8 +41,8 @@ class Model:
     """
 
     def __init__(self,
-        optimizer: object,
-        cost: object,
+        optimizer: BaseOptimizer,
+        cost: BaseLoss,
         batch_size: int = 64,
         metrics: list = None,
         dtype: type = np.float32
@@ -123,7 +128,7 @@ class Model:
         print('=' * line_length)
         print(f'Total params: {num_params}')
 
-    def add_layer(self, layer: object) -> None:
+    def add_layer(self, layer: BaseLayer) -> None:
         """
         Add a layer instance to the _layers array.
 

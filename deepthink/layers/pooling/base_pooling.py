@@ -6,9 +6,9 @@ class BasePooling(BaseLayer):
 
     def __init__(
         self,
-        pool_size=2,
-        stride=2,
-        input_shape=None,
+        pool_size: int = 2,
+        stride: int = 2,
+        input_shape: tuple = None,
         **kwargs
     ):
         super().__init__(
@@ -25,7 +25,7 @@ class BasePooling(BaseLayer):
         self.forward_view_shape = None  # shape for get_strided_view
         self.max_args = None  # indices of max values for backprop
 
-    def set_output_size(self):
+    def set_output_size(self) -> None:
         """
         Set the output size of the layer.
 

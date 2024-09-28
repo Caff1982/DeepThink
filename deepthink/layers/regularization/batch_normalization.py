@@ -35,15 +35,15 @@ class BatchNorm(BaseLayer):
     ----------
     - https://arxiv.org/pdf/1502.03167.pdf
     """
-    def __init__(self,  epsilon=1e-5, mom=0.9, **kwargs):
+    def __init__(self,  epsilon: float = 1e-5, mom: float = 0.9, **kwargs):
         super().__init__(**kwargs)
         self.epsilon = epsilon
         self.mom = mom
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return 'BatchNormalization'
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training.
 
@@ -88,7 +88,7 @@ class BatchNorm(BaseLayer):
         # Initialize array to store output
         self.output = np.zeros(self.input_shape, dtype=self.dtype)
 
-    def forward(self, inputs, training=True):
+    def forward(self, inputs: np.array, training: bool = True) -> np.array:
         """
         Perform the forward pass of the batch normalization layer.
 
@@ -133,7 +133,7 @@ class BatchNorm(BaseLayer):
         self.output = self.weights * self.X_norm + self.bias
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform the backward pass of the batch normalization layer.
 
@@ -194,5 +194,3 @@ class BatchNorm(BaseLayer):
                         * np.sum(grads * self.X_mu, axis=self.axes,
                                  keepdims=True))
                         / var_eps)
-
-        return self.dinputs

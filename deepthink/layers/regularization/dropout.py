@@ -24,15 +24,15 @@ class Dropout(BaseLayer):
     ----------
     - https://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf
     """
-    def __init__(self, proba, input_shape=None, **kwargs):
+    def __init__(self, proba: float, input_shape: tuple = None, **kwargs):
         super().__init__(**kwargs)
         self.proba = proba
         self.input_shape = input_shape
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'Dropout-{self.proba}'
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize settings to prepare the layer for training
         """
@@ -44,7 +44,7 @@ class Dropout(BaseLayer):
 
         self.output = np.zeros(self.input_shape, dtype=self.dtype)
 
-    def forward(self, X, training=True):
+    def forward(self, X: np.array, training: bool = True) -> np.array:
         """
         Apply dropout to the input.
 
@@ -70,7 +70,7 @@ class Dropout(BaseLayer):
             self.output = X.copy()
         return self.output
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Propagate gradients through the dropout mask during
         backpropagation.

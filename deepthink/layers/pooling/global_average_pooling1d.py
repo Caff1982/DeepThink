@@ -22,13 +22,13 @@ class GlobalAveragePooling1D(BaseGlobalPooling):
         are retained and the output shape is (batch_size, num_channels,
         1).
     """
-    def __init__(self, axes=(-1,), keep_dims=False, **kwargs):
+    def __init__(self, axes: tuple = (-1,), keep_dims: bool = False, **kwargs):
         super().__init__(
             axes=axes,
             keep_dims=keep_dims,
             **kwargs)
 
-    def backward(self, grads):
+    def backward(self, grads: np.array) -> None:
         """
         Perform backpropagation by computing the gradients.
 
@@ -51,4 +51,3 @@ class GlobalAveragePooling1D(BaseGlobalPooling):
             (1, 1,
              self.spatial_size)
         )
-        return self.dinputs
